@@ -252,7 +252,7 @@ def run(now):
         if not when or not timedelta(0) <= now - when < timedelta(hours=1):
             return False
         try:
-            return abs(float(previous['cost']) - p['cost']) < .01
+            return round(abs(float(previous['cost']) - p['cost']), 4) < .01
         except (TypeError, ValueError, KeyError):
             return False
     selected = [p for p in selected if not already_alerted(p)]
