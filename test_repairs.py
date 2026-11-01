@@ -80,3 +80,19 @@ class SportsReportTests(unittest.TestCase):
             self.assertIn('LIVE | BUY',body)
             self.assertEqual(body.count('Select '),10)
             delivered()
+
+class CryptoScheduleTests(unittest.TestCase):
+    def test_recent_breakout_survives_late_scan_without_chasing(self):
+        bars=[]
+        for i in range(80):
+            close=103. if i>=78 else 100.
+            bars.append({'t':(NOW-timedelta(minutes=(80-i)*5)).isoformat(),
+                         'c':close,'h':close+.2,'l':close-.2,'v':250 if i==78 else 100})
+        with patch.object(crypto,'SCAN_TIME',NOW),patch.object(crypto,'ema',side_effect=[102.,101.]),patch.object(crypto,'rsi',return_value=60.),patch.object(crypto,'atr',return_value=1.):
+            setup=crypto.setup(bars,103.,103.05)
+            self.assertIsNotNone(setup)
+            self.assertEqual(setup['bar'],bars[78]['t'])
+        with patch.object(crypto,'SCAN_TIME',NOW),patch.object(crypto,'ema',side_effect=[102.,101.]),patch.object(crypto,'rsi',return_value=60.),patch.object(crypto,'atr',return_value=1.):
+            self.assertIsNone(crypto.setup(bars,105.,105.05))
+        with patch.object(crypto,'SCAN_TIME',NOW+timedelta(minutes=20)),patch.object(crypto,'ema',side_effect=[102.,101.]),patch.object(crypto,'rsi',return_value=60.),patch.object(crypto,'atr',return_value=1.):
+            self.assertIsNone(crypto.setup(bars,103.,103.05))

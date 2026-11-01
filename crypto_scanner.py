@@ -150,22 +150,33 @@ def setup(bars, bid, ask):
     e50 = ema(closes[-100:], 50)
     strength = rsi(closes)
     volatility = atr(bars)
-    resistance = max(float(b['h']) for b in bars[-21:-1])
-    recent_volume = sum(volumes[-21:-1])/20
-    # Confirm a fresh breakout in completed 5m bars, not a continuing stale trend.
-    recent_breakout = closes[-1] > resistance and closes[-2] <= resistance
-    if not (recent_breakout and e20 > e50 and 52 <= strength <= 72
-            and volumes[-1] >= recent_volume * 1.3 and recent_volume > 0
-            and ask >= closes[-1] * 0.995 and ask <= closes[-1]*1.008):
+    # GitHub schedules can be late: consider recent completed breakout candles,
+    # while refusing to chase a price more than 0.8% above that breakout close.
+    breakout = None
+    for i in range(len(bars)-1, max(20, len(bars)-4)-1, -1):
+        prior = bars[i-20:i]
+        resistance = max(float(b['h']) for b in prior)
+        recent_volume = sum(float(b['v']) for b in prior)/20
+        bar = bars[i]
+        age = (SCAN_TIME - (parse_time(bar['t']) + timedelta(minutes=5))).total_seconds()
+        if (0 <= age <= 15*60 and float(bar['c']) > resistance
+                and recent_volume > 0 and float(bar['v']) >= recent_volume*1.3
+                and 52 <= strength <= 72 and e20 > e50
+                and float(bar['c'])*0.995 <= ask <= float(bar['c'])*1.008
+                and closes[-1] > resistance):
+            breakout = bar, recent_volume
+            break
+    if breakout is None:
         return None
+    bar, recent_volume = breakout
     if volatility <= 0:
         return None
     risk_per_unit = max(volatility * 1.5, ask * 0.003)
     stop = ask - risk_per_unit
     target = ask + risk_per_unit * 2.2
     return {'entry': ask, 'stop': stop, 'target': target,
-            'rsi': strength, 'volume_multiple': volumes[-1]/recent_volume,
-            'bar': bars[-1]['t']}
+            'rsi': strength, 'volume_multiple': float(bar['v'])/recent_volume,
+            'bar': bar['t']}
 
 
 def process(state, bars, quotes):
