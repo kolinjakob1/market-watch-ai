@@ -136,7 +136,9 @@ def run(now):
                             {'feed': 'opra', 'limit': 1000,
                              'expiration_date_gte': (now + timedelta(days=7)).date().isoformat(),
                              'expiration_date_lte': (now + timedelta(days=21)).date().isoformat(),
-                             'type': 'call'})
+                             'type': 'call',
+                             'strike_price_gte': quotes(snaps[symbol], now)[1] * .95,
+                             'strike_price_lte': quotes(snaps[symbol], now)[1] * 1.05})
             except ScannerError as exc:
                 if 'HTTP 403' not in str(exc):
                     raise

@@ -42,6 +42,9 @@ class SportsTests(unittest.TestCase):
         picks=sports.evaluate(market(),bbo,event(),NOW)
         self.assertEqual(picks[0]['team'],'Boston Celtics');self.assertGreater(picks[0]['edge'],.03)
         self.assertEqual(sports.evaluate(market(),bbo,event((2,2)),NOW),[])
+        target=sports.evaluate(market(),bbo,event((2,2)),NOW,min_edge=-1)[0]
+        self.assertLess(target['limit'],target['cost'])
+        self.assertGreaterEqual(target['fair']-target['limit']-.0695*target['limit']*(1-target['limit'])-.01,.03)
     def test_secret_safe_errors(self):
         method=Mock(return_value=Mock(status_code=401))
         with self.assertRaises(scanner.ScannerError) as err: scanner.request_json(method,'private-token','Feed')
@@ -69,6 +72,16 @@ class PaperTests(unittest.TestCase):
             s=self.state();paper.tick(s,{'AAPL':q},[self.entry()],NOW);self.assertEqual(s['positions'],[])
         q=snap();q['latestQuote']['as']=0
         self.assertIsNone(paper.quotes(q,NOW))
+    def test_option_contract_multiplier_and_affordability(self):
+        e={'symbol':'AAPL261120C00200000','underlying':'AAPL','multiplier':100,'feed':'opra'}
+        s=self.state()
+        paper.tick(s,{e['symbol']:snap(.8,.81)},[e],NOW)
+        self.assertEqual(s['positions'][0]['quantity'],1)
+        self.assertLess(s['positions'][0]['cost'],100)
+        s=self.state()
+        paper.tick(s,{e['symbol']:snap(1.1,1.11)},[e],NOW)
+        self.assertEqual(s['positions'],[])
+
     def test_stop_and_close(self):
         for closing, bid in [(False,9),(True,10)]:
             s=self.state();paper.tick(s,{'AAPL':snap()},[self.entry()],NOW)

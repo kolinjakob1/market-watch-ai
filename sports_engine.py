@@ -93,7 +93,7 @@ def match(market, events):
     return matches[0] if len(matches) == 1 else None
 
 
-def evaluate(m, bbo, event, now):
+def evaluate(m, bbo, event, now, min_edge=.03):
     fair = consensus(event, now)
     if not fair or bbo.get('state') != 'MARKET_STATE_OPEN':
         return []
@@ -114,10 +114,15 @@ def evaluate(m, bbo, event, now):
         fee = theta * cost * (1 - cost)
         # Reserve a further cent per contract for slippage/fee rounding.
         edge = p - cost - fee - .01
-        if .10 <= cost <= .90 and edge >= .03:
-            limit = cost
-            while limit + .001 < .99 and p - (limit + .001) - theta * (limit + .001) * (1 - limit - .001) - .01 >= .03:
-                limit += .001
+        if .10 <= cost <= .90 and edge >= min_edge:
+            low, high = 0., 1.
+            for _ in range(32):
+                mid = (low + high) / 2
+                if p - mid - theta * mid * (1-mid) - .01 >= .03:
+                    low = mid
+                else:
+                    high = mid
+            limit = math.floor(low * 1000) / 1000
             picks.append({'id': m['id'] + ':' + str(side['long']), 'slug': m['slug'],
                           'team': name, 'opponent': event['away_team'] if norm(name) == norm(event['home_team']) else event['home_team'],
                           'start': event['commence_time'], 'cost': cost, 'limit': limit,
@@ -139,14 +144,16 @@ def run(now):
         if not isinstance(rows, list):
             raise ScannerError('Unexpected Odds API response')
         events.extend(rows)
-    picks, matched = [], 0
+    picks, targets, matched = [], [], 0
     for m in markets:
         e = match(m, events)
         if not e:
             continue
         matched += 1
         data = request_json(requests.get, API + '/markets/' + quote(m['slug'], safe='') + '/bbo', 'Polymarket US')
-        picks.extend(evaluate(m, data.get('marketData') or {}, e, now))
+        assessed = evaluate(m, data.get('marketData') or {}, e, now, min_edge=-1)
+        targets.extend(assessed)
+        picks.extend(p for p in assessed if p['edge'] >= .03)
     picks.sort(key=lambda p: p['edge'], reverse=True)
     state_path = Path('sports_state.json')
     state = json.loads(state_path.read_text()) if state_path.exists() else {'alerts': {}}
@@ -167,6 +174,11 @@ def run(now):
     body = 'HUSTLEWATCH | MONEYLINE SIGNALS\n\n' + '\n\n'.join(lines) if lines else (
         f'HUSTLEWATCH SPORTS | NO NEW QUALIFYING PICKS\n{len(markets)} pregame moneylines; {matched} exact book matches.\n'
         f'{len(picks)} qualifying signals before duplicate filtering. No forced picks.')
+    if not lines and not picks and targets:
+        best = sorted(targets, key=lambda p: p['edge'], reverse=True)[:2]
+        body += '\n\nClosest entry targets (PASS at current price):\n' + '\n'.join(
+            f"{p['team']} ML vs {p['opponent']}: now {p['cost']*100:.1f}¢; enter only at/below {p['limit']*100:.1f}¢"
+            for p in best)
     body += '\nModel estimate, not a proven edge. Pregame only; verify price and size in app.'
     print(f'Sports: discovered={len(markets)} matched={matched} qualifying={len(picks)} new={len(fresh)}')
     def delivered():
