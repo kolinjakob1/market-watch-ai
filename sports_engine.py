@@ -202,6 +202,14 @@ def run(now):
         targets.append(p)
     targets.sort(key=lambda p: p['edge'], reverse=True)
     picks = [p for p in targets if p['edge'] >= .03]
+    # Explain why the leading assessed candidates are not actionable.
+    # Never manufacture BUY selections from a fixed report quota.
+    if targets:
+        best = targets[0]
+        print(f"Sports best net edge={best['edge']*100:+.2f} cents; "
+              f"short of BUY cutoff by {max(0, .03-best['edge'])*100:.2f} cents")
+    else:
+        print('Sports: no book-verified, quote-valid candidate available for evaluation')
     # Preserve live coverage alongside upcoming games when both exist.
     selected = targets[:10]
     for live in (True, False):
