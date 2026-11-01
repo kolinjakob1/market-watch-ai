@@ -19,7 +19,7 @@ def required_env(name):
 
 def telegram_token(value):
     # Copy/paste can add whitespace, quotes, or the URL's 'bot' prefix.
-    token = value.strip().strip("\"'").strip()
+    token = "".join(value.split()).strip("\"'").strip()
     if token.startswith("bot"):
         token = token[3:]
     if not re.fullmatch(r"[0-9]+:[A-Za-z0-9_-]+", token):
