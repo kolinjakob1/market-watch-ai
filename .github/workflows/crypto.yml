@@ -48,3 +48,10 @@ jobs:
             done
             exit 1
           fi
+
+      - name: Notify Telegram on failed dispatched scan
+        if: ${{ failure() && github.event_name == 'workflow_dispatch' }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python failure_fallback.py
