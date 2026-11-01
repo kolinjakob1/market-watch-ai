@@ -109,6 +109,9 @@ def telegram(message):
     response = requests.post(f'https://api.telegram.org/bot{token}/sendMessage', json={
         'chat_id': chat_id, 'text': message, 'disable_web_page_preview': True
     }, timeout=TIMEOUT)
+    if response.status_code != 200:
+    print(f"Telegram HTTP status: {response.status_code}")
+    print(f"Telegram response: {response.text[:300]}")
     response.raise_for_status()
     if not response.json().get('ok'):
         raise RuntimeError('Telegram rejected message')
