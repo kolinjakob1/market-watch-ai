@@ -242,6 +242,20 @@ def run(now):
     # Ranked assessed candidates remain primary; additional sports are clearly separate.
     state_path = Path('sports_state.json')
     state = json.loads(state_path.read_text()) if state_path.exists() else {'alerts': {}}
+    # Do not resend unchanged ranked candidates during the next hour.
+    # A price move of at least 1 cent permits a fresh evaluation alert.
+    def already_alerted(p):
+        previous = state.get('alerts', {}).get(p['id'])
+        if not previous:
+            return False
+        when = stamp(previous.get('time'))
+        if not when or not timedelta(0) <= now - when < timedelta(hours=1):
+            return False
+        try:
+            return abs(float(previous['cost']) - p['cost']) < .01
+        except (TypeError, ValueError, KeyError):
+            return False
+    selected = [p for p in selected if not already_alerted(p)]
     lines = [f'HUSTLEWATCH SPORTS | {len(selected)} RANKED CANDIDATES',
              now.astimezone(ZoneInfo('America/Los_Angeles')).strftime('%a %-I:%M %p PT'),
              f'{len(picks)} qualify | {matched} matched games ({live_markets} live)',
