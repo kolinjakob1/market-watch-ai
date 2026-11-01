@@ -1,4 +1,4 @@
-"""HustleWatch AI Polymarket US sports quote watchlist; no bets placed."""
+"""HustleWatch Polymarket US moneyline evaluation; no bets placed."""
 import os
 import re
 import sys
@@ -36,7 +36,7 @@ def request_json(method, url, service, **kwargs):
         if response.status_code == 429 and attempt < 2:
             time.sleep(10 * (attempt + 1))
             continue
-        if not response.ok:
+        if not 200 <= response.status_code < 300:
             raise ScannerError(f'{service} returned HTTP {response.status_code}')
         try:
             return response.json()
@@ -53,63 +53,6 @@ def price(amount):
     except (AttributeError, KeyError, InvalidOperation, TypeError):
         return None
 
-def candidates(now):
-    found = {}
-    for offset in range(0, 2000, 500):
-        data = request_json(requests.get, API + '/markets', 'Polymarket US', params={
-            'active':'true', 'closed':'false', 'categories':'sports',
-            'orderBy':'id', 'orderDirection':'desc', 'limit':500, 'offset':offset})
-        markets = data.get('markets') if isinstance(data, dict) else None
-        if not isinstance(markets, list):
-            raise ScannerError('Unexpected Polymarket market response')
-        for market in markets:
-            if not isinstance(market, dict):
-                continue
-            if (market.get('category') != 'sports' or not market.get('active')
-                or market.get('closed') or market.get('hidden')
-                or market.get('status') != 'MARKET_STATUS_OPEN'):
-                continue
-            try:
-                start = datetime.fromisoformat(market['gameStartTime'].replace('Z', '+00:00'))
-                if start.tzinfo is None or not (now - timedelta(hours=6) <= start <= now + timedelta(hours=48)):
-                    continue
-                found[market['id']] = market
-            except (KeyError, ValueError, TypeError):
-                continue
-        if len(markets) < 500:
-            break
-        time.sleep(0.4)
-    return sorted(found.values(), key=lambda m: m['gameStartTime'], reverse=True)
-
-def market_label(market):
-    kind = ' '.join(str(market.get(k) or '') for k in
-                    ('marketType', 'sportsMarketType', 'question', 'title')).lower()
-    if 'prop' in kind or 'player' in kind:
-        return 'PLAYER PROP'
-    if any(word in kind for word in ('moneyline', 'money line', 'match winner', 'game winner', 'to win')):
-        return 'MONEYLINE'
-    return 'OTHER SPORTS'
-
-def quote_card(market, data):
-    if not isinstance(data, dict) or data.get('state') != 'MARKET_STATE_OPEN':
-        return None
-    bid, ask = price(data.get('bestBid')), price(data.get('bestAsk'))
-    if bid is None or ask is None or bid > ask or ask - bid > Decimal('0.05'):
-        return None
-    yes_cost, no_cost = ask, Decimal(1) - bid
-    if not (Decimal('0.15') <= yes_cost <= Decimal('0.85')
-            and Decimal('0.15') <= no_cost <= Decimal('0.85')):
-        return None
-    question = ' '.join(str(market.get('question', 'Unknown prop')).split())
-    if len(question) > 115:
-        question = question[:112] + '...'
-    label = market_label(market)
-    status = ('UPCOMING' if datetime.fromisoformat(market['gameStartTime'].replace('Z', '+00:00'))
-              > datetime.now(timezone.utc) else 'STARTED (live unverified)')
-    return (f'{label} | {status}\n{question}\n'
-            f'YES {yes_cost * 100:.0f}¢ | NO {no_cost * 100:.0f}¢\n'
-            'Status: WATCH ONLY — no verified edge')
-
 def send_telegram(token, chat_id, message):
     result = request_json(requests.post, f'https://api.telegram.org/bot{token}/sendMessage',
         'Telegram', json={'chat_id':chat_id, 'text':message, 'disable_web_page_preview':True})
@@ -120,40 +63,14 @@ def main():
     dry_run = '--dry-run' in sys.argv
     token = telegram_token(required_env('TELEGRAM_BOT_TOKEN')) if not dry_run else None
     chat_id = required_env('TELEGRAM_CHAT_ID') if not dry_run else None
-    markets = candidates(datetime.now(timezone.utc))
-    cards = []
-    seen_groups = set()
-    type_counts = {'MONEYLINE':0, 'PLAYER PROP':0, 'OTHER SPORTS':0}
-    for market in markets[:150]:
-        group = (market.get('gameStartTime'), market.get('subjectId'),
-                 str(market.get('question', '')).split('above')[0])
-        if group in seen_groups:
-            continue
-        kind = market_label(market)
-        if type_counts[kind] >= 3:
-            continue
-        slug = market.get('slug')
-        if not slug:
-            continue
-        data = request_json(requests.get, API + '/markets/' + quote(slug, safe='') + '/bbo', 'Polymarket US')
-        card = quote_card(market, data.get('marketData')) if isinstance(data, dict) else None
-        if card:
-            cards.append(card)
-            seen_groups.add(group)
-            type_counts[kind] += 1
-        if len(cards) >= 9:
-            break
-        time.sleep(0.4)
-    if not cards:
-        body = 'HUSTLEWATCH SPORTS | NO QUALIFYING MARKETS\nNo verified betting picks; no acceptable open quotes this scan.'
-    else:
-        body = 'HUSTLEWATCH SPORTS | NO VERIFIED PICKS\nMarket quotes (research only):\n\n' + '\n\n'.join(cards[:3])
-        body += '\n\nNo estimated edge or confirmed live status. No bet recommendation.'
+    from sports_engine import run
+    body, delivered = run(datetime.now(timezone.utc))
     if dry_run:
         print(body)
     else:
         send_telegram(token, chat_id, body)
-    print(f'Reported {min(len(cards), 3)} market quotes; 0 verified betting picks.')
+        delivered()
+    print('Sports evaluation completed')
 
 if __name__ == '__main__':
     try:
@@ -161,3 +78,4 @@ if __name__ == '__main__':
     except ScannerError as exc:
         print(f'Scanner failed: {exc}', file=sys.stderr)
         sys.exit(1)
+

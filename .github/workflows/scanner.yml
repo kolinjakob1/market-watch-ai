@@ -1,26 +1,47 @@
-
 name: Sports Odds Scanner
-
-
 on:
   workflow_dispatch:
+  push:
+    paths: ['scanner.py', 'sports_engine.py', 'test_scanner.py', '.github/workflows/scanner.yml']
   schedule:
-    - cron: '2-59/5 * * * *'
-
-
+    - cron: '2-59/10 * * * *'
+permissions:
+  contents: write
+concurrency:
+  group: hustlewatch-sports
+  cancel-in-progress: false
 jobs:
   scan:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install dependencies
-        run: pip install requests
+      - run: pip install requests
+      - name: Regression checks
+        run: python -m unittest -v
       - name: Run scanner
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python scanner.py
+      - name: Persist alert deduplication
+        if: always()
+        run: |
+          if test -f sports_state.json; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add sports_state.json
+            if ! git diff --cached --quiet; then
+              git commit -m 'Update sports alert state [skip ci]'
+              for attempt in 1 2 3; do
+                git pull --rebase origin main && git push origin HEAD:main && exit 0
+              done
+              exit 1
+            fi
+          fi

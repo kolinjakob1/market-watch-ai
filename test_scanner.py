@@ -1,97 +1,87 @@
-import contextlib
-import io
-import os
+import json
+import tempfile
 import unittest
+from pathlib import Path
+from datetime import datetime, timezone, timedelta
 from unittest.mock import Mock, patch
-
-import requests
 import scanner
+import sports_engine as sports
+import paper_engine as paper
 
+NOW = datetime(2026,11,2,16,tzinfo=timezone.utc)
 
-class ScannerTests(unittest.TestCase):
-    def setUp(self):
-        self.env = patch.dict(os.environ, {
-            "ODDS_API_KEY": "fake-odds-key",
-            "TELEGRAM_BOT_TOKEN": " \n123456:fake_token\n ",
-            "TELEGRAM_CHAT_ID": " 12345\n",
-        }, clear=True)
-        self.env.start()
-        self.addCleanup(self.env.stop)
+def snap(bid=10,ask=10.01,age=0):
+    return {'latestQuote': {'bp':bid,'ap':ask,'bs':10,'as':10,'t':(NOW-timedelta(seconds=age)).isoformat()}}
 
-    def test_token_copy_paste_formats(self):
-        for value in ("123456:fake_\ntoken", " \n123456:fake_token\n ", '"123456:fake_token"', "bot123456:fake_token"):
-            self.assertEqual(scanner.telegram_token(value), "123456:fake_token")
+def event(prices=(1.6,2.5)):
+    return {'home_team':'Boston Celtics','away_team':'Miami Heat','commence_time':(NOW+timedelta(hours=2)).isoformat(),
+            'bookmakers':[{'key':str(i),'last_update':NOW.isoformat(),'markets':[{'key':'h2h','outcomes':[
+                {'name':'Boston Celtics','price':prices[0]},{'name':'Miami Heat','price':prices[1]}]}]} for i in range(3)]}
 
-    def test_bad_token_never_echoed(self):
-        for value in ("secret with spaces", "https://example.com/token", ""):
-            with self.assertRaises(scanner.ScannerError) as error:
-                scanner.telegram_token(value)
-            self.assertNotIn(value or "nothing", str(error.exception))
+def market():
+    return {'id':'1','slug':'test','feeCoefficient':.0695,'gameStartTime':(NOW+timedelta(hours=2)).isoformat(),
+            'marketSides':[{'long':True,'tradable':True,'team':{'name':'Boston Celtics'}},
+                           {'long':False,'tradable':True,'team':{'name':'Miami Heat'}}]}
 
-    @patch("scanner.time.sleep")
-    @patch("scanner.requests.post")
-    @patch("scanner.candidates", return_value=[])
-    def test_scan_and_alert(self, candidates, post, sleep):
-        post.return_value = Mock(status_code=200, json=Mock(return_value={"ok": True}))
-        scanner.main()
-        self.assertIn("No matching open props", post.call_args.kwargs["json"]["text"])
-        self.assertEqual(post.call_args.kwargs["json"]["chat_id"], "12345")
+class SportsTests(unittest.TestCase):
+    def test_exact_identity_and_date(self):
+        self.assertIsNotNone(sports.match(market(),[event()]))
+        e=event();e['home_team']='Boston';self.assertIsNone(sports.match(market(),[e]))
+        e=event();e['commence_time']=(NOW+timedelta(days=1)).isoformat();self.assertIsNone(sports.match(market(),[e]))
+    def test_minimum_fresh_books_and_draw(self):
+        e=event();self.assertIsNotNone(sports.consensus(e,NOW))
+        e['bookmakers'].pop();self.assertIsNone(sports.consensus(e,NOW))
+        e=event()
+        for b in e['bookmakers']: b['last_update']=(NOW-timedelta(hours=1)).isoformat()
+        self.assertIsNone(sports.consensus(e,NOW))
+        e=event()
+        for b in e['bookmakers']: b['markets'][0]['outcomes'].append({'name':'Draw','price':3})
+        self.assertIsNone(sports.consensus(e,NOW))
+    def test_fee_adjusted_positive_edge_only(self):
+        bbo={'state':'MARKET_STATE_OPEN','bestBid':{'value':'.49','currency':'USD'},'bestAsk':{'value':'.50','currency':'USD'}}
+        picks=sports.evaluate(market(),bbo,event(),NOW)
+        self.assertEqual(picks[0]['team'],'Boston Celtics');self.assertGreater(picks[0]['edge'],.03)
+        self.assertEqual(sports.evaluate(market(),bbo,event((2,2)),NOW),[])
+    def test_secret_safe_errors(self):
+        method=Mock(return_value=Mock(status_code=401))
+        with self.assertRaises(scanner.ScannerError) as err: scanner.request_json(method,'private-token','Feed')
+        self.assertNotIn('private',str(err.exception))
+    @patch('sports_engine.request_json')
+    def test_discovery_uses_moneyline_filter(self,request):
+        request.return_value={'markets':[]};self.assertEqual(sports.discover(NOW),[])
+        self.assertEqual(request.call_args.kwargs['params']['marketTypes'],'moneyline')
 
-    def test_exact_prop_and_complement_offer(self):
-        m = {"id": "1", "slug": "example", "question": "Player above 24.5?",
-             "gameStartTime": "2026-11-01T20:00:00Z", "marketSides": [
-             {"description": "Yes", "long": True, "tradable": True},
-             {"description": "No", "long": False, "tradable": True}]}
-        d = {"state": "MARKET_STATE_OPEN", "bestBid": {"value": "0.4", "currency": "USD"},
-             "bestAsk": {"value": "0.45", "currency": "USD"}}
-        text = scanner.prop_message(m, d, scanner.datetime.now(scanner.timezone.utc))
-        self.assertIn("Player above 24.5?", text)
-        self.assertIn("Yes: 45.00", text)
-        self.assertIn("No: 60.00", text)
-        d["bestAsk"] = None
-        self.assertIn("Yes: no available offer", scanner.prop_message(m, d, scanner.datetime.now(scanner.timezone.utc)))
-        d["state"] = "MARKET_STATE_EXPIRED"
-        self.assertIsNone(scanner.prop_message(m, d, scanner.datetime.now(scanner.timezone.utc)))
+class PaperTests(unittest.TestCase):
+    def state(self):
+        return {'version':1,'cash':500,'realized':0,'positions':[],'closed':[],'last_entry':{}}
+    def entry(self): return {'symbol':'AAPL','underlying':'AAPL','multiplier':1,'feed':'iex'}
+    def test_buy_dedup_exit_and_cash_account_settlement(self):
+        s=self.state();e=self.entry()
+        self.assertEqual(len(paper.tick(s,{'AAPL':snap()},[e],NOW)),1)
+        self.assertGreaterEqual(s['cash'],400);self.assertLess(s['cash'],401)
+        paper.tick(s,{'AAPL':snap()},[e],NOW);self.assertEqual(len(s['positions']),1)
+        paper.tick(s,{'AAPL':snap(11,11.01)},[e],NOW)
+        self.assertEqual(len(s['closed']),1);self.assertEqual(len(s['positions']),0)
+        self.assertGreater(s['realized'],0);self.assertLess(s['cash'],401)
+        paper.tick(s,{},[],NOW+timedelta(days=1));self.assertGreater(s['cash'],500)
+    def test_stale_crossed_nonfinite_and_zero_size_rejected(self):
+        for q in [snap(age=3600),snap(11,10),snap(float('nan'),10)]:
+            s=self.state();paper.tick(s,{'AAPL':q},[self.entry()],NOW);self.assertEqual(s['positions'],[])
+        q=snap();q['latestQuote']['as']=0
+        self.assertIsNone(paper.quotes(q,NOW))
+    def test_stop_and_close(self):
+        for closing, bid in [(False,9),(True,10)]:
+            s=self.state();paper.tick(s,{'AAPL':snap()},[self.entry()],NOW)
+            paper.tick(s,{'AAPL':snap(bid,bid+.01)},[],NOW,closing)
+            self.assertEqual(len(s['closed']),1)
+    def test_corrupt_state_never_silently_resets(self):
+        with tempfile.TemporaryDirectory() as d:
+            p=Path(d)/'state.json';p.write_text('{invalid')
+            with self.assertRaises(json.JSONDecodeError):paper.load(p)
+    @patch('paper_engine.request_json',return_value={'is_open':False})
+    @patch.dict('os.environ',{'ALPACA_API_KEY':'fake','ALPACA_SECRET_KEY':'fake'})
+    def test_closed_market_no_orders_or_quote_fills(self,request):
+        with tempfile.TemporaryDirectory() as d, patch('paper_engine.Path',return_value=Path(d)/'state.json'):
+            self.assertIn('Market closed',paper.run(NOW));self.assertEqual(request.call_count,1)
 
-    def test_bad_prices(self):
-        for value in ("NaN", "Infinity", "0", "1", "-1", "nonsense"):
-            self.assertIsNone(scanner.price({"value": value, "currency": "USD"}))
-
-    @patch("scanner.requests.get")
-    def test_missing_secret_stops_before_network(self, get):
-        del os.environ["TELEGRAM_CHAT_ID"]
-        with self.assertRaises(scanner.ScannerError):
-            scanner.main()
-        get.assert_not_called()
-
-    def test_http_failures_hide_url_and_body(self):
-        for service in ("Telegram", "Odds API"):
-            for status in (400, 401, 403, 404, 429, 500):
-                method = Mock(return_value=Mock(status_code=status, text="private-response"))
-                with self.assertRaises(scanner.ScannerError) as error:
-                    scanner.request_json(method, "https://example.com/private-token", service)
-                self.assertNotIn("private", str(error.exception))
-
-    def test_network_failures_hide_credentials(self):
-        for exception in (requests.Timeout, requests.ConnectionError, requests.HTTPError):
-            with self.assertRaises(scanner.ScannerError) as error:
-                scanner.request_json(Mock(side_effect=exception("private-token")), "private-url", "Telegram")
-            self.assertNotIn("private", str(error.exception))
-
-    def test_invalid_json(self):
-        method = Mock(return_value=Mock(status_code=200, json=Mock(side_effect=ValueError("private-body"))))
-        with self.assertRaises(scanner.ScannerError) as error:
-            scanner.request_json(method, "private-url", "Telegram")
-        self.assertNotIn("private", str(error.exception))
-
-    @patch("scanner.requests.post")
-    @patch("scanner.requests.get")
-    def test_empty_scan_and_unconfirmed_delivery(self, get, post):
-        get.return_value = Mock(status_code=200, json=Mock(return_value={"markets": []}))
-        post.return_value = Mock(status_code=200, json=Mock(return_value={"ok": False}))
-        with self.assertRaises(scanner.ScannerError):
-            scanner.main()
-
-
-if __name__ == "__main__":
-    unittest.main()
+if __name__=='__main__':unittest.main()

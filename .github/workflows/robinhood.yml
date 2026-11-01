@@ -1,19 +1,30 @@
 name: Stock and Options Scanner
 on:
   workflow_dispatch:
+  push:
+    paths: ['robinhood_scanner.py', 'paper_engine.py', '.github/workflows/robinhood.yml']
   schedule:
-    - cron: '2,7,12,17,22,27,32,37,42,47,52,57 * * * *'
+    - cron: '4-59/5 13-21 * * 1-5'
+    - cron: '14 16 * * 0,6'
+permissions:
+  contents: write
+concurrency:
+  group: hustlewatch-paper
+  cancel-in-progress: false
 jobs:
   stock_scan:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: pip install requests
-      - name: Run stock/options scanner
+      - run: python -m unittest -v
+      - name: Run paper simulator
         env:
           ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
           ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
@@ -21,3 +32,18 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           WATCHLIST: AAPL,NVDA,TSLA,SPY,QQQ
         run: python robinhood_scanner.py
+      - name: Persist paper ledger
+        if: always()
+        run: |
+          if test -f paper_state.json; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add paper_state.json
+            if ! git diff --cached --quiet; then
+              git commit -m 'Update paper trade ledger [skip ci]'
+              for attempt in 1 2 3; do
+                git pull --rebase origin main && git push origin HEAD:main && exit 0
+              done
+              exit 1
+            fi
+          fi
