@@ -73,7 +73,7 @@ def candidates(now):
                 continue
             try:
                 start = datetime.fromisoformat(market["gameStartTime"].replace("Z", "+00:00"))
-                if start.tzinfo is None or not (now - timedelta(hours=6) <= start <= now):
+                if start.tzinfo is None or not (now - timedelta(hours=6) <= start <= now + timedelta(hours=48)):
                     continue
                 found[market["id"]] = market
             except (KeyError, ValueError, TypeError):
@@ -109,7 +109,8 @@ def quote_card(market, data):
         question = question[:112] + "..."
     label = market_label(market)
     # These are quotes only; event status and independent edge are unverified.
-    return (f"{label} | STARTED (live unverified)\n{question}\n"
+    status = "UPCOMING" if datetime.fromisoformat(market["gameStartTime"].replace("Z", "+00:00")) > datetime.now(timezone.utc) else "STARTED (live unverified)"
+return (f"{label} | {status}\n{question}\n"
             f"YES {yes_cost * 100:.0f}¢ | NO {no_cost * 100:.0f}¢\n"
             "Status: WATCH ONLY — no verified edge")
 
