@@ -59,7 +59,7 @@ def candidates(now):
     for offset in range(0, 2000, 500):
         data = request_json(requests.get, API + "/markets", "Polymarket US", params={
             "active":"true", "closed":"false", "categories":"sports",
-            "marketTypes":"props", "orderBy":"id", "orderDirection":"desc",
+            "orderBy":"id", "orderDirection":"desc",
             "limit":500, "offset":offset})
         markets = data.get("markets") if isinstance(data, dict) else None
         if not isinstance(markets, list):
@@ -67,13 +67,13 @@ def candidates(now):
         for market in markets:
             if not isinstance(market, dict):
                 continue
-            if (market.get("category") != "sports" or market.get("marketType") != "props"
+            if (market.get("category") != "sports"
                 or not market.get("active") or market.get("closed") or market.get("hidden")
                 or market.get("status") != "MARKET_STATUS_OPEN"):
                 continue
             try:
                 start = datetime.fromisoformat(market["gameStartTime"].replace("Z", "+00:00"))
-                if start.tzinfo is None or not (now - timedelta(hours=3) <= start <= now + timedelta(hours=3)):
+                if start.tzinfo is None or not (now - timedelta(hours=6) <= start <= now):
                     continue
                 found[market["id"]] = market
             except (KeyError, ValueError, TypeError):
@@ -81,8 +81,18 @@ def candidates(now):
         if len(markets) < 500:
             break
         time.sleep(0.4)
-    # Started games first; upcoming games second. Listed times aren't proof a game remains live.
-    return sorted(found.values(), key=lambda m:(m["gameStartTime"] > now.isoformat(),m["gameStartTime"]))
+    # Event start time alone does not verify that an event is currently live.
+    return sorted(found.values(), key=lambda m: m["gameStartTime"], reverse=True)
+
+def market_label(market):
+    # Use provider metadata when present; never assume every sports market is a prop.
+    kind = " ".join(str(market.get(k) or "") for k in
+                    ("marketType", "sportsMarketType", "question", "title")).lower()
+    if "prop" in kind or "player" in kind:
+        return "PLAYER PROP"
+    if any(word in kind for word in ("moneyline", "money line", "match winner", "game winner", "to win")):
+        return "MONEYLINE"
+    return "OTHER SPORTS"
 
 def quote_card(market, data):
     if not isinstance(data, dict) or data.get("state") != "MARKET_STATE_OPEN":
@@ -97,8 +107,9 @@ def quote_card(market, data):
     question = " ".join(str(market.get("question", "Unknown prop")).split())
     if len(question) > 115:
         question = question[:112] + "..."
-    # These are market quotes, not a profitability signal.
-    return (f"{question}\n"
+    label = market_label(market)
+    # These are quotes only; event status and independent edge are unverified.
+    return (f"{label} | STARTED (live unverified)\n{question}\n"
             f"YES {yes_cost * 100:.0f}¢ | NO {no_cost * 100:.0f}¢\n"
             "Status: WATCH ONLY — no verified edge")
 
@@ -115,10 +126,14 @@ def main():
     markets = candidates(datetime.now(timezone.utc))
     cards = []
     seen_groups = set()
-    for market in markets[:50]:
+    type_counts = {"MONEYLINE": 0, "PLAYER PROP": 0, "OTHER SPORTS": 0}
+    for market in markets[:150]:
         group = (market.get("gameStartTime"),market.get("subjectId"),
                  str(market.get("question", "")).split("above")[0])
         if group in seen_groups:
+            continue
+        kind = market_label(market)
+        if type_counts[kind] >= 3:
             continue
         slug = market.get("slug")
         if not slug:
@@ -128,7 +143,8 @@ def main():
         if card:
             cards.append(card)
             seen_groups.add(group)
-        if len(cards) >= 3:
+            type_counts[kind] += 1
+        if len(cards) >= 9:
             break
         time.sleep(0.4)
     # No spam when no eligible market; logs still show what happened.
@@ -136,7 +152,7 @@ def main():
         print("NO TRADE: no markets with acceptable quotes. Nothing sent.")
         return
     body = "HustleWatch AI | SPORTS WATCH\n\n" + "\n\n".join(cards)
-    body += "\n\nQuotes can move. No model-backed picks yet; do not treat this as a buy alert."
+    body += "\n\nStarted does NOT confirm live play. Quotes only; NO BUY signal without verified status and edge."
     if dry_run:
         print(body)
     else:
