@@ -246,6 +246,46 @@ def process(state, bars, quotes):
                       f'Stop ${candidate["stop"]:,.2f} | allocation ${spent:.2f}\n'
                       f'RSI {candidate["rsi"]:.0f} | volume {candidate["volume_multiple"]:.1f}x | {candidate.get("strategy", "breakout")}\n'
                       f'Max planned risk ~${RISK_PER_TRADE:.2f}; slips/gaps may exceed this')
+    # Additional small exploration trades are PAPER ONLY and explicitly labeled.
+    # These are research samples, not BUY recommendations or expected profit.
+    # They use the same fresh quote, closed-candle, spread and risk checks.
+    if not events and not state['positions'] and state['cash'] >= 25:
+        for symbol in SYMBOLS:
+            prices = quote_prices(quotes.get(symbol))
+            history = bars.get(symbol, [])
+            if prices is None or len(history) < 70:
+                continue
+            if (SCAN_TIME - (parse_time(history[-1]['t']) + timedelta(minutes=5))).total_seconds() > 1200:
+                continue
+            last_exit = state['cooldown'].get(symbol)
+            if last_exit and (SCAN_TIME - parse_time(last_exit)).total_seconds() < 3600:
+                continue
+            bid, ask = prices
+            closes = [float(x['c']) for x in history]
+            momentum = rsi(closes)
+            baseline = ema(closes[-60:], 20)
+            slow = ema(closes[-100:], 50)
+            volatility = atr(history)
+            if not (baseline > slow and 48 <= momentum <= 68
+                    and closes[-1] > closes[-4] and closes[-1] > baseline
+                    and ask <= closes[-1] * 1.005 and volatility > 0):
+                continue
+            risk_distance = max(1.5 * volatility, ask * 0.003)
+            per_unit_risk = risk_distance + ask * 2 * FEE_RATE
+            qty = min(1.0 / per_unit_risk, 20.0 / (ask * (1 + FEE_RATE)))
+            spent = qty * ask * (1 + FEE_RATE)
+            if qty * ask < 10 or spent > state['cash']:
+                continue
+            state['cash'] -= spent
+            state['positions'][symbol] = {
+                'qty': qty, 'entry': ask, 'stop': ask - risk_distance,
+                'target': ask + risk_distance * 1.8, 'spent': spent,
+                'time': iso(SCAN_TIME), 'bar': history[-1]['t'],
+                'strategy': 'exploration_paper'}
+            events.append(f'EXPLORATORY PAPER BUY | {symbol} | simulated entry ${ask:,.4f}'
+                          f' | allocated ${spent:.2f} | estimated planned risk <= $1'
+                          '\\nResearch sample only; NOT a recommended real-money trade.')
+            break
     return events
 
 
