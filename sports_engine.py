@@ -258,7 +258,7 @@ def run(now):
     selected = [p for p in selected if not already_alerted(p)]
     lines = [f'HUSTLEWATCH SPORTS | {len(selected)} RANKED CANDIDATES',
              now.astimezone(ZoneInfo('America/Los_Angeles')).strftime('%a %-I:%M %p PT'),
-             f'{len(picks)} qualify | {matched} matched games ({live_markets} live)',
+             f'{len(picks)} qualify overall (including already alerted) | {matched} matched games ({live_markets} live)',
              'BUY = meets model rules. PASS = wait; do not buy now.']
     for i, p in enumerate(selected, 1):
         when = stamp(p['start']).astimezone(ZoneInfo('America/Los_Angeles')).strftime('%a %-I:%M %p PT')
