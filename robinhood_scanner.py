@@ -1,15 +1,13 @@
-
-"""HustleWatch: stocks, options and crypto market observations to Telegram.
-No broker orders; no performance or profitability claims.
-"""
+"""HustleWatch stock, options and crypto observations. Does not place trades."""
 import os
+import re
 import sys
 from datetime import datetime, timezone
 import requests
 
 API = 'https://data.alpaca.markets'
-KEY = os.environ.get('ALPACA_API_KEY', '')
-SECRET = os.environ.get('ALPACA_SECRET_KEY', '')
+KEY = os.environ.get('ALPACA_API_KEY', '').strip()
+SECRET = os.environ.get('ALPACA_SECRET_KEY', '').strip()
 STOCKS = [x.strip().upper() for x in os.environ.get('WATCHLIST', 'AAPL,NVDA,TSLA,SPY,QQQ').split(',') if x.strip()]
 CRYPTOS = ['BTC/USD', 'ETH/USD', 'SOL/USD']
 TIMEOUT = 20
@@ -48,7 +46,7 @@ def stock_alerts():
         spread = (ask - bid) / ask * 100
         if abs(move) >= 2 and spread <= 0.35:
             alerts.append((abs(move), f'STOCK | {symbol}: ${ask:.2f} | {move:+.1f}% vs prior close | spread {spread:.2f}%'))
-    return [text for _, text in sorted(alerts, reverse=True)[:3]]
+    return [message for _, message in sorted(alerts, reverse=True)[:3]]
 
 
 def options_alerts():
@@ -68,15 +66,11 @@ def options_alerts():
             spread = (ask - bid) / ask * 100
             if spread > 10:
                 continue
-            # OCC format: underlying + YYMMDD + C/P + 8-digit strike (1/1000 USD).
             tail = contract[-15:]
-            if len(tail) != 15 or tail[6] not in 'CP':
+            if len(tail) != 15 or tail[6] not in 'CP' or not re.fullmatch(r'\d{6}[CP]\d{8}', tail):
                 continue
-            try:
-                expiry = f'20{tail[:2]}-{tail[2:4]}-{tail[4:6]}'
-                strike = int(tail[7:]) / 1000
-            except ValueError:
-                continue
+            expiry = f'20{tail[:2]}-{tail[2:4]}-{tail[4:6]}'
+            strike = int(tail[7:]) / 1000
             kind = 'CALL' if tail[6] == 'C' else 'PUT'
             picks.append((spread, f'OPTION | {symbol} {kind} ${strike:g} exp {expiry} | bid ${bid:.2f} ask ${ask:.2f} | spread {spread:.1f}%'))
         if picks:
@@ -101,18 +95,24 @@ def crypto_alerts():
 
 
 def telegram(message):
-    token = os.environ['TELEGRAM_BOT_TOKEN']
-    chat_id = os.environ['TELEGRAM_CHAT_ID']
+    token = ''.join(os.environ['TELEGRAM_BOT_TOKEN'].split()).strip('"\'')
+    if token.startswith('bot'):
+        token = token[3:]
+    chat_id = os.environ['TELEGRAM_CHAT_ID'].strip()
     if os.environ.get('DRY_RUN') == '1':
         print(message)
         return
     response = requests.post(f'https://api.telegram.org/bot{token}/sendMessage', json={
         'chat_id': chat_id, 'text': message, 'disable_web_page_preview': True
     }, timeout=TIMEOUT)
-    if response.status_code != 200:
-    print(f"Telegram HTTP status: {response.status_code}")
-    print(f"Telegram response: {response.text[:300]}")
-    response.raise_for_status()
+    if not response.ok:
+        # Do not print Telegram's full response: it could contain identifying data.
+        print(f'Telegram HTTP status: {response.status_code}')
+        try:
+            print(f'Telegram error: {response.json().get("description", "unknown error")[:120]}')
+        except (ValueError, AttributeError):
+            print('Telegram returned a non-JSON error')
+        response.raise_for_status()
     if not response.json().get('ok'):
         raise RuntimeError('Telegram rejected message')
 
