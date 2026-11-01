@@ -44,7 +44,7 @@ jobs:
           import os
           import urllib.request
 
-          token = os.environ["TELEGRAM_BOT_TOKEN"].strip()
+          token = ''.join(os.environ["TELEGRAM_BOT_TOKEN"].split()).strip(chr(34) + chr(39))
           if token.startswith("bot"):
               token = token[3:]
 
