@@ -160,23 +160,36 @@ def setup(bars, bid, ask):
         bar = bars[i]
         age = (SCAN_TIME - (parse_time(bar['t']) + timedelta(minutes=5))).total_seconds()
         if (0 <= age <= 15*60 and float(bar['c']) > resistance
-                and recent_volume > 0 and float(bar['v']) >= recent_volume*1.3
-                and 52 <= strength <= 72 and e20 > e50
+                and recent_volume > 0 and float(bar['v']) >= recent_volume*1.05
+                and 45 <= strength <= 78 and e20 > e50
                 and float(bar['c'])*0.995 <= ask <= float(bar['c'])*1.008
                 and closes[-1] > resistance):
             breakout = bar, recent_volume
             break
+    # Paper-learning fallback: a modest rising trend after a short pullback.
+    # Still requires fresh completed candles, a reasonable spread, and positive momentum.
+    strategy = 'breakout'
     if breakout is None:
-        return None
-    bar, recent_volume = breakout
+        if not (e20 > e50 and 46 <= strength <= 76
+                and closes[-1] > closes[-4]
+                and closes[-1] > e20
+                and e20 <= ask <= e20 * 1.012
+                and ask <= closes[-1] * 1.006
+                and volumes[-1] > 0):
+            return None
+        bar = bars[-1]
+        recent_volume = max(sum(volumes[-21:-1])/20, 1e-12)
+        strategy = 'trend'
+    else:
+        bar, recent_volume = breakout
     if volatility <= 0:
         return None
     risk_per_unit = max(volatility * 1.5, ask * 0.003)
     stop = ask - risk_per_unit
-    target = ask + risk_per_unit * 2.2
+    target = ask + risk_per_unit * (2.2 if strategy == 'breakout' else 1.8)
     return {'entry': ask, 'stop': stop, 'target': target,
             'rsi': strength, 'volume_multiple': float(bar['v'])/recent_volume,
-            'bar': bar['t']}
+            'bar': bar['t'], 'strategy': strategy}
 
 
 def process(state, bars, quotes):
@@ -231,7 +244,7 @@ def process(state, bars, quotes):
         events.append(f'PAPER BUY | {symbol}\n'
                       f'Simulated buy ${ask:,.2f} | target ${candidate["target"]:,.2f}\n'
                       f'Stop ${candidate["stop"]:,.2f} | allocation ${spent:.2f}\n'
-                      f'RSI {candidate["rsi"]:.0f} | volume {candidate["volume_multiple"]:.1f}x | 5m breakout\n'
+                      f'RSI {candidate["rsi"]:.0f} | volume {candidate["volume_multiple"]:.1f}x | {candidate.get("strategy", "breakout")}\n'
                       f'Max planned risk ~${RISK_PER_TRADE:.2f}; slips/gaps may exceed this')
     return events
 
