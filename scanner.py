@@ -145,15 +145,15 @@ def main():
             break
         time.sleep(0.4)
     if not cards:
-        print('NO TRADE: no markets with acceptable quotes. Nothing sent.')
-        return
-    body = 'HustleWatch AI | SPORTS WATCH\n\n' + '\n\n'.join(cards)
-    body += '\n\nStarted does NOT confirm live play. Quotes only; NO BUY signal without verified status and edge.'
+        body = 'HUSTLEWATCH SPORTS | NO QUALIFYING MARKETS\nNo verified betting picks; no acceptable open quotes this scan.'
+    else:
+        body = 'HUSTLEWATCH SPORTS | NO VERIFIED PICKS\nMarket quotes (research only):\n\n' + '\n\n'.join(cards[:3])
+        body += '\n\nNo estimated edge or confirmed live status. No bet recommendation.'
     if dry_run:
         print(body)
     else:
         send_telegram(token, chat_id, body)
-    print(f'Reported {len(cards)} watchlist markets in one message.')
+    print(f'Reported {min(len(cards), 3)} market quotes; 0 verified betting picks.')
 
 if __name__ == '__main__':
     try:
