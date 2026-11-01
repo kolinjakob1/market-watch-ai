@@ -25,3 +25,23 @@ for game in response.json():
         for market in book.get("markets", []):
             for pick in market.get("outcomes", []):
                 print(pick["name"], pick["price"])
+                
+# Send Telegram alert
+token = os.environ["TELEGRAM_BOT_TOKEN"]
+chat_id = os.environ["TELEGRAM_CHAT_ID"]
+
+message = (
+    "Market Watch AI\n"
+    "Sports odds scan completed!\n"
+    f"Games found: {len(response.json())}"
+)
+
+telegram = requests.post(
+    f"https://api.telegram.org/bot{token}/sendMessage",
+    json={"chat_id": chat_id, "text": message},
+    timeout=20
+)
+
+telegram.raise_for_status()
+print("Telegram notification sent.")
+
