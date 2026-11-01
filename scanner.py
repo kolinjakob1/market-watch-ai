@@ -96,30 +96,31 @@ def price(amount):
         return None
 
 
+
 def prop_message(market, data, now):
-    # Skip markets without a valid two-sided quote.
-bid = price(data.get("bestBid"))
-ask = price(data.get("bestAsk"))
-
-if bid is None or ask is None:
-    return None
-
-# Reject broken or excessively wide markets.
-if bid > ask or ask - bid > Decimal("0.05"):
-    return None
-
-# Only consider contracts priced between 15c and 85c.
-# These are screening limits, not proof of value.
-if not Decimal("0.15") <= ask <= Decimal("0.85"):
-    return None
-
-# Reject extremely expensive NO positions.
-no_cost = Decimal("1") - bid
-if not Decimal("0.15") <= no_cost <= Decimal("0.85"):
-    return None
-
-    if bid is not None and ask is not None and bid > ask:
+    if data.get("state") != "MARKET_STATE_OPEN":
         return None
+
+    # Skip unavailable markets
+    bid = price(data.get("bestBid"))
+    ask = price(data.get("bestAsk"))
+
+    if bid is None or ask is None:
+        return None
+
+    # Skip wide spreads or invalid quotes
+    if bid > ask or ask - bid > Decimal("0.05"):
+        return None
+
+    # Only consider prices between 15c and 85c
+    if not Decimal("0.15") <= ask <= Decimal("0.85"):
+        return None
+
+    no_cost = Decimal("1") - bid
+    if not Decimal("0.15") <= no_cost <= Decimal("0.85"):
+        return None
+
+
     lines = ["HustleWatch AI | Polymarket US PROP", market["question"]]
     if market.get("title"):
         lines.append("Contract: " + market["title"])
