@@ -2,12 +2,12 @@
   "cash": 500.0,
   "closed": [],
   "cooldown": {},
-  "last_heartbeat": "2026-11-01T20:13:10+00:00",
+  "last_heartbeat": "2026-11-01T20:18:10+00:00",
   "last_scan": {
     "events": 0,
     "fresh_quotes": 10,
     "symbols": 10,
-    "time": "2026-11-01T20:13:10+00:00"
+    "time": "2026-11-01T20:18:10+00:00"
   },
   "positions": {},
   "version": 1
