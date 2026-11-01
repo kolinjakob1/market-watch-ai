@@ -1,0 +1,28 @@
+
+import os
+import requests
+
+API_KEY = os.environ["ODDS_API_KEY"]
+URL = "https://api.the-odds-api.com/v4/sports/upcoming/odds"
+
+response = requests.get(
+    URL,
+    params={
+        "apiKey": API_KEY,
+        "regions": "us",
+        "markets": "h2h",
+        "oddsFormat": "american",
+    },
+    timeout=20,
+)
+response.raise_for_status()
+
+for game in response.json():
+    print(f"\n{game['sport_title']}")
+    print(f"{game['away_team']} vs {game['home_team']}")
+
+    for bookmaker in game.get("bookmakers", [])[:2]:
+        print(bookmaker["title"])
+        for market in bookmaker["markets"]:
+            for outcome in market["outcomes"]:
+                print(outcome["name"], outcome["price"])
