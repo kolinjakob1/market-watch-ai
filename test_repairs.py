@@ -97,5 +97,5 @@ class CryptoScheduleTests(unittest.TestCase):
             self.assertEqual(setup['bar'],bars[78]['t'])
         with patch.object(crypto,'SCAN_TIME',NOW),patch.object(crypto,'ema',side_effect=[102.,101.]),patch.object(crypto,'rsi',return_value=60.),patch.object(crypto,'atr',return_value=1.):
             self.assertIsNone(crypto.setup(bars,105.,105.05))
-        with patch.object(crypto,'SCAN_TIME',NOW+timedelta(minutes=20)),patch.object(crypto,'ema',side_effect=[102.,101.]),patch.object(crypto,'rsi',return_value=60.),patch.object(crypto,'atr',return_value=1.):
+        with patch.object(crypto,'SCAN_TIME',NOW+timedelta(minutes=21)),patch.object(crypto,'ema',side_effect=[102.,101.]),patch.object(crypto,'rsi',return_value=60.),patch.object(crypto,'atr',return_value=1.):
             self.assertIsNone(crypto.setup(bars,103.,103.05))
