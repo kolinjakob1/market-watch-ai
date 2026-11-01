@@ -2,8 +2,8 @@
 name: HustleWatch Crypto Signals
 
 on:
+  workflow_dispatch:
   # Automatic runs are dispatched by cadence.yml, not GitHub cron.
-
 permissions:
   contents: write
 
