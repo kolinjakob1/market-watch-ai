@@ -33,7 +33,11 @@ def telegram_token(value):
 
 def request_json(method, url, service, **kwargs):
     try:
-        response = method(url, timeout=20, allow_redirects=False, **kwargs)
+        for attempt in range(4):
+            response = method(url, timeout=20, allow_redirects=False, **kwargs)
+            if response.status_code != 429 or service != "Polymarket US" or attempt == 3:
+                break
+            time.sleep(10 * (attempt + 1))
     except requests.RequestException:
         # requests exception strings may contain URLs with API credentials.
         raise ScannerError(f"{service} request failed; check connectivity and retry.") from None
@@ -56,6 +60,7 @@ def candidates(now):
     """Bound discovery to 5,000 recent props; never claim full coverage."""
     found = {}
     for offset in range(0, 5000, 500):
+        time.sleep(1)
         data = request_json(requests.get, API + "/markets", "Polymarket US",
             params={"active": "true", "closed": "false", "categories": "sports",
                     "marketTypes": "props", "orderBy": "id", "orderDirection": "desc",
@@ -113,7 +118,7 @@ def prop_message(market, data, now):
         lines.append(f"Bid/ask spread: {(ask - bid) * 100:.2f} cents")
     lines.extend(["Retrieved (UTC): " + now.isoformat(timespec="seconds"),
         "Market ID: " + str(market["id"]),
-        "Market data: " + API + "/markets/" + quote(market["slug"], safe=""),
+        "Market data: " + API + "/market/slug/" + quote(market["slug"], safe=""),
         "Quotes exclude fees; availability and prices can change. Market listing, not a recommended bet."])
     return "\n".join(lines)
 
@@ -132,6 +137,7 @@ def main():
                  market.get("subjectId"), market["question"].split("above")[0])
         if groups.get(group, 0) >= 1:
             continue
+        time.sleep(1)
         data = request_json(requests.get,
             API + "/markets/" + quote(market["slug"], safe="") + "/bbo", "Polymarket US")
         message = prop_message(market, data.get("marketData", {}), datetime.now(timezone.utc))
