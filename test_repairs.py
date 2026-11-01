@@ -80,6 +80,9 @@ class SportsReportTests(unittest.TestCase):
             self.assertIn('LIVE | BUY',body)
             self.assertEqual(body.count('Select '),10)
             delivered()
+            repeated, _ = sports.run(NOW)
+            self.assertIn('10 RANKED CANDIDATES', repeated)
+            self.assertEqual(repeated.count('Select '), 10)
 
 class CryptoScheduleTests(unittest.TestCase):
     def test_recent_breakout_survives_late_scan_without_chasing(self):
