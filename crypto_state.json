@@ -1,25 +1,25 @@
 {
-  "cash": 480.0,
-  "closed": [],
-  "cooldown": {},
-  "last_heartbeat": "2026-11-01T22:13:10+00:00",
+  "cash": 499.85326027366585,
+  "closed": [
+    {
+      "entry": 2264.312,
+      "exit": 2254.452,
+      "pnl": -0.15,
+      "reason": "STOP",
+      "symbol": "ETH/USD",
+      "time": "2026-11-01T22:18:11+00:00"
+    }
+  ],
+  "cooldown": {
+    "ETH/USD": "2026-11-01T22:18:11+00:00"
+  },
+  "last_heartbeat": "2026-11-01T22:18:11+00:00",
   "last_scan": {
-    "events": 0,
+    "events": 1,
     "fresh_quotes": 10,
     "symbols": 10,
-    "time": "2026-11-01T22:13:10+00:00"
+    "time": "2026-11-01T22:18:11+00:00"
   },
-  "positions": {
-    "ETH/USD": {
-      "bar": "2026-11-01T21:40:00Z",
-      "entry": 2264.312,
-      "qty": 0.008819475819852167,
-      "spent": 20.0,
-      "stop": 2257.519064,
-      "strategy": "exploration_paper",
-      "target": 2276.5392847999997,
-      "time": "2026-11-01T21:48:11+00:00"
-    }
-  },
+  "positions": {},
   "version": 1
 }
