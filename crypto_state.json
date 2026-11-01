@@ -13,12 +13,12 @@
   "cooldown": {
     "ETH/USD": "2026-11-01T22:18:11+00:00"
   },
-  "last_heartbeat": "2026-11-01T22:23:08+00:00",
+  "last_heartbeat": "2026-11-01T22:28:09+00:00",
   "last_scan": {
     "events": 0,
     "fresh_quotes": 10,
     "symbols": 10,
-    "time": "2026-11-01T22:23:08+00:00"
+    "time": "2026-11-01T22:28:09+00:00"
   },
   "positions": {},
   "version": 1
