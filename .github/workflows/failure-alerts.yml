@@ -4,6 +4,7 @@ name: HustleWatch Failure Alerts
 on:
   workflow_run:
     workflows:
+      - HustleWatch Cadence Scheduler
       - Sports Odds Scanner
       - Stock and Options Scanner
       - HustleWatch Crypto Signals
@@ -15,7 +16,7 @@ permissions:
 
 jobs:
   notify:
-    if: ${{ contains(fromJSON('["failure","timed_out","cancelled"]'), github.event.workflow_run.conclusion) }}
+    if: ${{ contains(fromJSON('["failure","timed_out"]'), github.event.workflow_run.conclusion) || (github.event.workflow_run.conclusion == 'cancelled' && github.event.workflow_run.name != 'HustleWatch Cadence Scheduler') }}
     runs-on: ubuntu-latest
     steps:
       - name: Record failure in GitHub

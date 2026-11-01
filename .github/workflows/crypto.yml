@@ -2,11 +2,7 @@
 name: HustleWatch Crypto Signals
 
 on:
-  push:
-    paths: ['crypto_scanner.py', '.github/workflows/crypto.yml']
-  workflow_dispatch:
-  schedule:
-    - cron: '3-58/5 * * * *'
+  # Automatic runs are dispatched by cadence.yml, not GitHub cron.
 
 permissions:
   contents: write

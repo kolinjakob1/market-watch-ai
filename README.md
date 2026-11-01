@@ -16,3 +16,12 @@ Run `python -m unittest -v` for regression tests. Run `python scanner.py --dry-r
 
 
 Crypto runs the closed-five-minute-bar breakout strategy, allowing the last three completed candles (at most 15 minutes old) to accommodate delayed scheduled runs without chasing more than 0.8% above the breakout close, on BTC, ETH, SOL, AVAX, LINK, LTC, BCH, DOGE, UNI and AAVE USD pairs. Every scan sends prices and HOLD/WAIT/BLOCKED diagnostics instead of a once-daily heartbeat. Missing/stale data never creates an entry; an all-quote outage fails visibly. Its separate local $500 ledger keeps a $125 allocation cap, two-position cap, fees, stops, targets and cooldowns. Persistence runs even if Telegram fails. Paper BUY means a simulated position was recorded; it is not a broker order. A lack of qualifying breakouts is not repaired by forced fills.
+
+
+## Scan clock
+
+`cadence.yml` keeps one dispatcher running, instead of relying on a new GitHub cron event for each scan. It starts crypto at UTC minutes 03/08/13/18/23/28/33/38/43/48/53/58; sports at 02/12/22/32/42/52; stocks at 04/09/.../59 in the existing weekday UTC 13–21 window, plus a weekend 16:14 status report. Each dispatched scanner checks out current main and retains its existing concurrency, ledger and failure notification behavior. Individual scanner workflows are manual/API only; their old cron and push triggers are removed to avoid duplicate scans.
+
+The first deployment uses a 90-second clock session to verify replacement handoff immediately. Subsequent sessions run 55 minutes and require an accepted self-dispatch before ending. An hourly cron at minute 11 provides recovery if a worker dies; it can still be late. Scanner API dispatch is retried, sustained dispatch failure fails visibly, and the existing Telegram failure workflow also watches the clock. Disable the Cadence Scheduler workflow in Actions to stop the clock and its queued successors.
+
+This improves launch cadence but is not a real-time guarantee: GitHub runner queues, outages, handoff and data/Telegram latency can delay scans and delivery. Run creation, job start, scan start and alert delivery are different timestamps. The scheduler deliberately runs only while this repository is public, where standard GitHub-hosted Linux runners are free; changing it to private stops this scheduler rather than silently consuming continuous billed minutes. It does not change repository visibility. A separately hosted scheduler remains the durable option for strict uptime.

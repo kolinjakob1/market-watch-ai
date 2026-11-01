@@ -1,10 +1,8 @@
 name: Sports Odds Scanner
 on:
   workflow_dispatch:
-  push:
-    paths: ['scanner.py', 'sports_engine.py', 'test_scanner.py', '.github/workflows/scanner.yml']
-  schedule:
-    - cron: '2-59/10 * * * *'
+  # Automatic runs are dispatched by cadence.yml, not GitHub cron.
+
 permissions:
   contents: write
 concurrency:

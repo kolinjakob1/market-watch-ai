@@ -1,0 +1,39 @@
+name: HustleWatch Cadence Scheduler
+on:
+  workflow_dispatch:
+    inputs:
+      cursor:
+        description: 'Internal next scan slots, carried across clock handoff'
+        required: false
+        type: string
+  push:
+    paths: ['cadence_scheduler.py', 'test_cadence.py', '.github/workflows/cadence.yml']
+  schedule:
+    - cron: '11 * * * *'
+permissions:
+  actions: write
+  contents: read
+concurrency:
+  group: hustlewatch-clock
+  cancel-in-progress: false
+jobs:
+  clock:
+    # Standard public-repository runner. Avoid surprise private-repository usage.
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify clock and recovery rules
+        run: python -m unittest test_cadence -v
+      - name: Dispatch scans on the clock and hand off
+        env:
+          RESUME_CURSOR: ${{ inputs.cursor }}
+          GH_TOKEN: ${{ github.token }}
+          SESSION_SECONDS: ${{ github.event_name == 'push' && '90' || '3300' }}
+        run: python -u cadence_scheduler.py
