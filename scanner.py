@@ -109,8 +109,8 @@ def quote_card(market, data):
         question = question[:112] + "..."
     label = market_label(market)
     # These are quotes only; event status and independent edge are unverified.
-    status = "UPCOMING" if datetime.fromisoformat(market["gameStartTime"].replace("Z", "+00:00")) > datetime.now(timezone.utc) else "STARTED (live unverified)"
-return (f"{label} | {status}\n{question}\n"
+        status = "UPCOMING" if datetime.fromisoformat(market["gameStartTime"].replace("Z", "+00:00")) > datetime.now(timezone.utc) else "STARTED (live unverified)"
+        return (f"{label} | {status}\n{question}\n"
             f"YES {yes_cost * 100:.0f}¢ | NO {no_cost * 100:.0f}¢\n"
             "Status: WATCH ONLY — no verified edge")
 
