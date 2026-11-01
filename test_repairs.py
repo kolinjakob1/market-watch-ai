@@ -53,3 +53,30 @@ class Repairs(unittest.TestCase):
             for ask in [float('nan'),float('inf')]:
                 self.assertIsNone(crypto.quote_prices({'t':NOW.isoformat(),'bp':100,'ap':ask}))
             self.assertIsNone(crypto.quote_prices({'t':(NOW-timedelta(hours=1)).isoformat(),'bp':100,'ap':100.1}))
+
+class SportsReportTests(unittest.TestCase):
+    def test_ten_distinct_candidates_and_live_coverage(self):
+        markets, events = [], []
+        for i in range(14):
+            m, e = market(), event()
+            start = NOW + timedelta(hours=i+1) if i else NOW-timedelta(minutes=20)
+            e['home_team'] += str(i);e['away_team'] += str(i)
+            e['commence_time']=start.isoformat()
+            for b in e['bookmakers']:
+                b['markets'][0]['outcomes'][0]['name']=e['home_team']
+                b['markets'][0]['outcomes'][1]['name']=e['away_team']
+            m.update(id=str(i),slug='game'+str(i),gameStartTime=start.isoformat())
+            for side,team in zip(m['marketSides'],[e['home_team'],e['away_team']]):
+                side['team'].update(name=team,league='nba')
+            markets.append(m);events.append(e)
+        def api(method,url,service,**kwargs):
+            if url.endswith('/sports'):return [{'key':'basketball_nba','active':True,'title':'NBA'}]
+            if url.endswith('/odds'):return events
+            return {'marketData':{'state':'MARKET_STATE_OPEN','bestBid':{'value':'.49','currency':'USD'},
+                    'bestAsk':{'value':'.50','currency':'USD'},'lastPriceSample':{'ts':NOW.isoformat()}}}
+        with tempfile.TemporaryDirectory() as tmp,patch.object(sports,'discover',return_value=markets),patch.object(sports,'request_json',side_effect=api),patch.object(sports,'required_env',return_value='fake'),patch.object(sports,'Path',return_value=Path(tmp)/'sports.json'):
+            body,delivered=sports.run(NOW)
+            self.assertIn('10 RANKED CANDIDATES',body)
+            self.assertIn('LIVE | BUY',body)
+            self.assertEqual(body.count('Select '),10)
+            delivered()
