@@ -27,6 +27,9 @@ jobs:
 
       - run: pip install requests
 
+      - name: Verify paper crypto risk controls
+        run: python -m unittest test_crypto -v
+
       - name: Run crypto signal scanner
         env:
           ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
