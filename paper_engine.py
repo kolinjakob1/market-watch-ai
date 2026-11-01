@@ -117,16 +117,27 @@ def run(now):
     state = load(path)
     clock = get('/v2/clock', trading=True)
     notes = []
+    candidates = []
     if clock.get('is_open') is True:
         symbols = list(dict.fromkeys([s.strip().upper() for s in __import__('os').environ.get('WATCHLIST','AAPL,NVDA,TSLA,SPY,QQQ').split(',') if s.strip()] +
                                     [p['underlying'] for p in state['positions']]))
         snaps = get('/v2/stocks/snapshots', {'symbols': ','.join(symbols), 'feed': 'iex'})
         entries = []
+        fresh_count = 0
         for symbol in symbols:
             q = quotes(snaps.get(symbol, {}), now)
             prior = number((snaps.get(symbol, {}).get('prevDailyBar') or {}).get('c'))
+            if q:
+                fresh_count += 1
+            if q and prior:
+                change = q[1]/prior-1
+                candidates.append((change, f'{symbol} | ask ${q[1]:.2f} | day {change:+.1%} | ' + ('SETUP' if .02 <= change <= .08 else 'WAIT: requires +2% to +8% momentum')))
+            else:
+                candidates.append((-999, f'{symbol} | BLOCKED: missing/stale quote or prior close'))
             if q and prior and .02 <= q[1]/prior-1 <= .08:
                 entries.append({'symbol': symbol, 'underlying': symbol, 'multiplier': 1, 'feed': 'iex'})
+        if not fresh_count:
+            raise ScannerError('No fresh stock quotes during open session; paper fills blocked')
         option_status = 'Options: no momentum setup'
         # Prefer affordable near-the-money calls for bullish momentum, else stock.
         for e in list(entries):
@@ -173,9 +184,12 @@ def run(now):
             raise ScannerError('Alpaca clock missing next_close')
         closing = (close-now).total_seconds() <= 900
         notes = tick(state, snaps, entries, now, closing)
-        status = 'Regular session open' + ('; closing positions' if closing else '') + '\n' + option_status
+        status = f'{len(symbols)} symbols; {fresh_count} fresh IEX quotes\nRegular session open' + ('; closing positions' if closing else '') + '\n' + option_status
     else:
-        status = 'Market closed; no stale-price fills'
+        next_open = date(clock.get('next_open'))
+        from zoneinfo import ZoneInfo
+        next_text = next_open.astimezone(ZoneInfo('America/Los_Angeles')).strftime('%a %-I:%M %p PT') if next_open else 'check exchange calendar'
+        status = 'Market closed; no stale-price fills. Next open: ' + next_text
     equity = state['cash'] + sum(x['amount'] for x in state.get('unsettled', [])) + sum(p.get('mark',p['entry'])*p['quantity']*p['multiplier'] for p in state['positions'])
     state['updated_at'] = now.isoformat()
     state['equity'] = round(equity, 6)
@@ -185,6 +199,8 @@ def run(now):
             f"Equity ${equity:.2f} | cash ${state['cash']:.2f}\nRealized ${state['realized']:+.2f} | "
             f"{len(state['positions'])} open | {len(state['closed'])} closed ({wins} wins)\n\n")
     body += '\n'.join(notes) if notes else 'No entries/exits this scan.'
+    if candidates:
+        body += '\n\nTOP 10 STOCK CANDIDATES (WAIT is not a buy):\n' + '\n'.join(row for _, row in sorted(candidates, reverse=True)[:10])
     body += '\nMomentum v1; $100 cap/position. Simulated fills; no broker orders. Options require fresh OPRA quotes. Fixed rules; results logged, no automatic model retraining.'
     print(f"Paper: equity={equity:.2f} open={len(state['positions'])} closed={len(state['closed'])}")
     return body[:3900]

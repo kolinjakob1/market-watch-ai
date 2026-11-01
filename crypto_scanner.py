@@ -13,7 +13,8 @@ from pathlib import Path
 import requests
 
 API = 'https://data.alpaca.markets/v1beta3/crypto/us'
-SYMBOLS = ['BTC/USD', 'ETH/USD', 'SOL/USD']
+SYMBOLS = ['BTC/USD', 'ETH/USD', 'SOL/USD', 'AVAX/USD', 'LINK/USD',
+           'LTC/USD', 'BCH/USD', 'DOGE/USD', 'UNI/USD', 'AAVE/USD']
 STATE_FILE = Path(__file__).with_name('crypto_state.json')
 STARTING_CASH = 500.0
 RISK_PER_TRADE = 5.0
@@ -106,7 +107,7 @@ def market_data():
               'start': start, 'limit': 1000, 'sort': 'asc'}
     all_bars = {s: [] for s in SYMBOLS}
     token = None
-    for _ in range(4):
+    for _ in range(10):
         if token:
             params['page_token'] = token
         data = api('/bars', params)
@@ -131,7 +132,7 @@ def quote_prices(q):
         return None
     age = (SCAN_TIME - parse_time(q['t'])).total_seconds()
     bid, ask = float(q.get('bp') or 0), float(q.get('ap') or 0)
-    if not (-10 <= age <= QUOTE_MAX_AGE and 0 < bid <= ask):
+    if not (math.isfinite(bid) and math.isfinite(ask) and -10 <= age <= QUOTE_MAX_AGE and 0 < bid <= ask):
         return None
     if (ask - bid)/ask > 0.008:
         return None
@@ -216,8 +217,8 @@ def process(state, bars, quotes):
         state['positions'][symbol] = {'qty': qty, 'entry': ask,
             'stop': candidate['stop'], 'target': candidate['target'],
             'spent': spent, 'time': iso(SCAN_TIME), 'bar': candidate['bar']}
-        events.append(f'PAPER ENTRY WATCH | {symbol}\n'
-                      f'Buy trigger ${ask:,.2f} | target ${candidate["target"]:,.2f}\n'
+        events.append(f'PAPER BUY | {symbol}\n'
+                      f'Simulated buy ${ask:,.2f} | target ${candidate["target"]:,.2f}\n'
                       f'Stop ${candidate["stop"]:,.2f} | allocation ${spent:.2f}\n'
                       f'RSI {candidate["rsi"]:.0f} | volume {candidate["volume_multiple"]:.1f}x | 5m breakout\n'
                       f'Max planned risk ~${RISK_PER_TRADE:.2f}; slips/gaps may exceed this')
@@ -230,27 +231,48 @@ def main():
             raise RuntimeError(f'Missing {key}')
     state = load_state()
     bars, quotes = market_data()
+    if not any(quote_prices(quotes.get(s)) for s in SYMBOLS):
+        raise RuntimeError('No fresh valid crypto quotes; paper trading blocked')
     events = process(state, bars, quotes)
     # State is saved before notification to preserve simulated positions on rerun.
     save_state(state)
     for event in events:
         notify('HUSTLEWATCH CRYPTO | ' + iso(SCAN_TIME) + '\n' + event + '\nResearch/paper only; no trades placed.')
-    # Daily heartbeat, even if no setups. No false claim of a profitable trade.
-    old = state.get('last_heartbeat') or ''
-    if os.getenv('TEST_ALERT') == '1' or not old or (SCAN_TIME - parse_time(old)).total_seconds() >= 24*3600:
-        mid = {s: (float(q['bp']) + float(q['ap'])) / 2
-               for s,q in quotes.items() if s in SYMBOLS and quote_prices(q)}
-        total = state['cash'] + sum(pos['qty'] * mid.get(s, pos['entry'])
-                                    for s, pos in state['positions'].items())
-        message = ('HUSTLEWATCH CRYPTO | SCAN OK\n'
-                   + ' | '.join(f'{s.split("/")[0]} ${v:,.2f}' for s, v in mid.items())
-                   + f'\nPaper cash ${state["cash"]:.2f} | estimated equity ${total:.2f}'
-                   + f' | open {len(state["positions"])}\n'
-                   + ('No qualifying entry now.' if not events else 'Signals above.')
-                   + '\nNo real trades placed.')
-        notify(message)
-        state['last_heartbeat'] = iso(SCAN_TIME)
-        save_state(state)
+    # Every scan reports what prevented an entry, including unavailable data.
+    mid = {s: (float(q['bp']) + float(q['ap'])) / 2
+           for s,q in quotes.items() if s in SYMBOLS and quote_prices(q)}
+    total = state['cash'] + sum(pos['qty'] * mid.get(s, pos['entry'])
+                                for s, pos in state['positions'].items())
+    rows = []
+    for symbol in SYMBOLS:
+        q = quote_prices(quotes.get(symbol))
+        history = bars.get(symbol, [])
+        if symbol in state['positions']:
+            p = state['positions'][symbol]
+            status = f"HOLD | stop ${p['stop']:,.2f} | target ${p['target']:,.2f}"
+        elif q is None:
+            status = 'BLOCKED: quote missing, stale, invalid or spread too wide'
+        elif len(history) < 70:
+            status = 'BLOCKED: insufficient closed candles'
+        elif (SCAN_TIME - (parse_time(history[-1]['t']) + timedelta(minutes=5))).total_seconds() > 1200:
+            status = 'BLOCKED: stale candles'
+        elif symbol in state['cooldown'] and (SCAN_TIME-parse_time(state['cooldown'][symbol])).total_seconds() < 3600:
+            status = 'WAIT: exit cooldown'
+        elif setup(history, *q):
+            status = 'SETUP: capacity/cash/risk checks apply'
+        else:
+            status = 'WAIT: breakout/trend/RSI/volume rules not met'
+        px = f"${q[1]:,.4f}" if q else 'no fresh price'
+        rows.append(f"{symbol} | {px} | {status}")
+    message = ('HUSTLEWATCH CRYPTO | PAPER SCAN\n' + iso(SCAN_TIME)
+               + f"\nCash ${state['cash']:.2f} | estimated equity ${total:.2f}"
+               + f" | open {len(state['positions'])} | closed {len(state['closed'])}\n\n"
+               + '\n'.join(rows) + '\nSimulated entries only when rules qualify; no real orders.')
+    notify(message)
+    state['last_heartbeat'] = iso(SCAN_TIME)
+    state['last_scan'] = {'time': iso(SCAN_TIME), 'fresh_quotes': len(mid),
+                          'events': len(events), 'symbols': len(SYMBOLS)}
+    save_state(state)
     print(f'Completed: {len(events)} signal(s), {len(state["positions"])} open paper position(s).')
 
 

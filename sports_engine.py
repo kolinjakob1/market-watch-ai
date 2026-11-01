@@ -1,4 +1,4 @@
-"""Pregame two-way moneylines: conservative book consensus versus Polymarket US."""
+"""Live and upcoming two-way moneylines: conservative book consensus versus Polymarket US."""
 import json
 import math
 import statistics
@@ -34,7 +34,7 @@ def discover(now):
             raise ScannerError('Unexpected market discovery response')
         for m in rows:
             start = stamp(m.get('gameStartTime'))
-            if (start and now + timedelta(minutes=5) < start < now + timedelta(hours=36)
+            if (start and now - timedelta(hours=8) < start < now + timedelta(hours=48)
                     and m.get('marketType') == 'moneyline' and m.get('active')
                     and not m.get('closed') and not m.get('hidden')
                     and m.get('status') == 'MARKET_STATUS_OPEN'):
@@ -47,13 +47,15 @@ def discover(now):
 def consensus(event, now):
     """Remove each book's margin; require three independent fresh two-way books."""
     home, away = norm(event['home_team']), norm(event['away_team'])
+    live = bool(stamp(event.get('commence_time')) and stamp(event['commence_time']) <= now)
+    max_age = 60 if live else 300
     books = {}
     for book in event.get('bookmakers', []):
         for market in book.get('markets', []):
             if market.get('key') != 'h2h':
                 continue
             updated = stamp(market.get('last_update') or book.get('last_update'))
-            if not updated or not -15 <= (now - updated).total_seconds() <= 300:
+            if not updated or not -15 <= (now - updated).total_seconds() <= max_age:
                 continue
             outcomes = market.get('outcomes', [])
             if len(outcomes) != 2:
@@ -94,6 +96,11 @@ def match(market, events):
 
 
 def evaluate(m, bbo, event, now, min_edge=.03):
+    live = bool(stamp(event.get('commence_time')) and stamp(event['commence_time']) <= now)
+    if live:
+        sample = stamp((bbo.get('lastPriceSample') or {}).get('ts'))
+        if not sample or not -15 <= (now-sample).total_seconds() <= 30:
+            return []
     fair = consensus(event, now)
     if not fair or bbo.get('state') != 'MARKET_STATE_OPEN':
         return []
@@ -123,7 +130,7 @@ def evaluate(m, bbo, event, now, min_edge=.03):
                 else:
                     high = mid
             limit = math.floor(low * 1000) / 1000
-            picks.append({'id': m['id'] + ':' + str(side['long']), 'slug': m['slug'],
+            picks.append({'id': str(m['id']) + ':' + str(side['long']), 'slug': m['slug'],
                           'team': name, 'opponent': event['away_team'] if norm(name) == norm(event['home_team']) else event['home_team'],
                           'start': event['commence_time'], 'cost': cost, 'limit': limit,
                           'fair': p, 'edge': edge, 'books': fair[1]})
@@ -134,56 +141,133 @@ def run(now):
     markets = discover(now)
     # Only fetch leagues represented on the exchange, one request per league per scan.
     leagues = {'nfl': 'americanfootball_nfl', 'nba': 'basketball_nba', 'nhl': 'icehockey_nhl',
-               'mlb': 'baseball_mlb', 'ncaaf': 'americanfootball_ncaaf', 'ncaab': 'basketball_ncaab', 'cbb': 'basketball_ncaab', 'cfb': 'americanfootball_ncaaf'}
+               'mlb': 'baseball_mlb', 'ncaaf': 'americanfootball_ncaaf', 'ncaab': 'basketball_ncaab',
+               'cbb': 'basketball_ncaab', 'cfb': 'americanfootball_ncaaf', 'wcbb': 'basketball_wncaab',
+               'wnba': 'basketball_wnba', 'ufc': 'mma_mixed_martial_arts', 'boxing': 'boxing_boxing',
+               'eurolg': 'basketball_euroleague', 'nbl': 'basketball_nbl',
+               'epl': 'soccer_epl', 'mls': 'soccer_usa_mls', 'laliga': 'soccer_spain_la_liga',
+               'bundesliga': 'soccer_germany_bundesliga', 'seriea': 'soccer_italy_serie_a',
+               'ligue1': 'soccer_france_ligue_one', 'ucl': 'soccer_uefa_champs_league'}
     present = {str((s.get('team') or {}).get('league', '')).lower() for m in markets for s in m.get('marketSides', [])}
+    catalog = request_json(requests.get, 'https://api.the-odds-api.com/v4/sports', 'Odds API',
+                           params={'apiKey': required_env('ODDS_API_KEY')})
+    if not isinstance(catalog, list):
+        raise ScannerError('Unexpected sports catalog response')
+    sport_keys = {leagues[k] for k in present & leagues.keys()}
+    # Include each available tour/event for tennis, esports and cricket families.
+    families = {'atp': 'tennis_atp_', 'wta': 'tennis_wta_', 'cs2': 'esports_cs',
+                'dota2': 'esports_dota', 'lol': 'esports_lol', 't20icr': 'cricket_',
+                'odicr': 'cricket_'}
+    for item in catalog:
+        key = item.get('key', '')
+        if item.get('active') and (any(k in present and key.startswith(prefix) for k, prefix in families.items())
+                or any(norm(k) == norm(item.get('title', '')) or norm(k) == norm(key) for k in present)):
+            sport_keys.add(key)
+    active_keys = {i['key'] for i in catalog if i.get('active')}
+    sport_keys &= active_keys
     events = []
-    for sport in sorted({leagues[k] for k in present & leagues.keys()}):
+    for sport in sorted(sport_keys):
         rows = request_json(requests.get, 'https://api.the-odds-api.com/v4/sports/' + sport + '/odds',
                             'Odds API', params={'apiKey': required_env('ODDS_API_KEY'), 'regions': 'us',
                                                 'markets': 'h2h', 'oddsFormat': 'decimal'})
         if not isinstance(rows, list):
             raise ScannerError('Unexpected Odds API response')
         events.extend(rows)
-    picks, targets, matched = [], [], 0
+    targets, matched, errors = [], 0, []
+    live_markets = 0
+    checked_ids = set()
     for m in markets:
         e = match(m, events)
         if not e:
             continue
+        checked_ids.add(str(m['id']))
         matched += 1
-        data = request_json(requests.get, API + '/markets/' + quote(m['slug'], safe='') + '/bbo', 'Polymarket US')
-        assessed = evaluate(m, data.get('marketData') or {}, e, now, min_edge=-1)
-        targets.extend(assessed)
-        picks.extend(p for p in assessed if p['edge'] >= .03)
-    picks.sort(key=lambda p: p['edge'], reverse=True)
+        live = stamp(e['commence_time']) <= now
+        live_markets += int(live)
+        # Recompute time after network requests, so older odds cannot appear fresh.
+        checked = max(now, datetime.now(timezone.utc))
+        try:
+            data = request_json(requests.get, API + '/markets/' + quote(m['slug'], safe='') + '/bbo', 'Polymarket US')
+        except ScannerError as exc:
+            errors.append(str(exc))
+            continue
+        assessed = evaluate(m, data.get('marketData') or {}, e, checked, min_edge=-1)
+        if not assessed:
+            continue
+        # One direction per game. Never pad the report with both opposing teams.
+        p = max(assessed, key=lambda p: p['edge'])
+        p['league'] = str((m['marketSides'][0].get('team') or {}).get('league', '')).upper()
+        p['live'] = live
+        p['checked'] = checked.isoformat()
+        targets.append(p)
+    targets.sort(key=lambda p: p['edge'], reverse=True)
+    picks = [p for p in targets if p['edge'] >= .03]
+    # Preserve live coverage alongside upcoming games when both exist.
+    selected = targets[:10]
+    for live in (True, False):
+        if not any(p['live'] == live for p in selected):
+            other = next((p for p in targets if p['live'] == live), None)
+            if other and len(selected) == 10:
+                selected[-1] = other
+    # Show unmatched sports as UNRATED, never invent book probabilities or edges.
+    # Rotate through leagues to avoid letting a large college/tennis slate hide others.
+    extras = []
+    seen_leagues = {p['league'].lower() for p in selected}
+    unmatched = [m for m in markets if str(m['id']) not in checked_ids]
+    unmatched.sort(key=lambda m: (str((m.get('marketSides', [{}])[0].get('team') or {}).get('league','')) in seen_leagues,
+                                  abs((stamp(m['gameStartTime'])-now).total_seconds())))
+    attempted = 0
+    for m in unmatched:
+        if attempted >= 30 or len(extras) >= max(3, 10-len(selected)):
+            break
+        sides = m.get('marketSides', [])
+        if len(sides) != 2 or {x.get('long') for x in sides} != {True,False} or not all(x.get('tradable') and (x.get('team') or {}).get('name') for x in sides):
+            continue
+        league = str((sides[0].get('team') or {}).get('league','')).lower()
+        if league in {p['league'].lower() for p in extras}:
+            continue
+        attempted += 1
+        try:
+            d = request_json(requests.get, API + '/markets/' + quote(m['slug'], safe='') + '/bbo', 'Polymarket US').get('marketData') or {}
+        except ScannerError as exc:
+            errors.append(str(exc)); continue
+        bid, ask = price(d.get('bestBid')), price(d.get('bestAsk'))
+        if d.get('state') != 'MARKET_STATE_OPEN' or bid is None or ask is None or bid > ask or ask-bid > .04:
+            continue
+        side = next(x for x in sides if x['long'] == (float(bid+ask)/2 >= .5))
+        other = next(x for x in sides if x is not side)
+        extras.append({'team':side['team']['name'], 'opponent':other['team']['name'],
+                       'cost':float(ask if side['long'] else 1-bid), 'slug':m['slug'],
+                       'league':league.upper(), 'start':m['gameStartTime']})
+    # Ranked assessed candidates remain primary; additional sports are clearly separate.
     state_path = Path('sports_state.json')
     state = json.loads(state_path.read_text()) if state_path.exists() else {'alerts': {}}
-    fresh = []
-    for p in picks:
-        old = state['alerts'].get(p['id'])
-        if old and stamp(old['time']) and (now - stamp(old['time'])).total_seconds() < 7200 and p['cost'] >= old['cost'] - .02:
-            continue
-        fresh.append(p)
-        if len(fresh) == 3:
-            break
-    lines = []
-    for p in fresh:
+    lines = [f'HUSTLEWATCH SPORTS | {len(selected)} RANKED CANDIDATES',
+             now.astimezone(ZoneInfo('America/Los_Angeles')).strftime('%a %-I:%M %p PT'),
+             f'{len(picks)} qualify | {matched} matched games ({live_markets} live)',
+             'BUY = meets model rules. PASS = wait; do not buy now.']
+    for i, p in enumerate(selected, 1):
         when = stamp(p['start']).astimezone(ZoneInfo('America/Los_Angeles')).strftime('%a %-I:%M %p PT')
-        lines.append(f"{p['team']} ML vs {p['opponent']} | {when}\nBuy {p['cost']*100:.1f}¢; limit {p['limit']*100:.1f}¢\n"
-                     f"Consensus {p['fair']:.0%} ({p['books']} books); net model edge {p['edge']*100:.1f}¢\n"
+        label = 'LIVE' if p['live'] else 'UPCOMING'
+        action = 'BUY' if p['edge'] >= .03 else 'PASS'
+        lines.append(f"{i}. {p['league']} | {label} | {action} {p['team']} ML\nvs {p['opponent']} | {when}\n"
+                     f"Select {p['team']} to WIN. Now {p['cost']*100:.1f}¢; max entry {p['limit']*100:.1f}¢\n"
+                     f"Book estimate {p['fair']:.0%}; net edge {p['edge']*100:+.1f}¢ ({p['books']} books)\n"
                      f"https://polymarket.us/market/{p['slug']}")
-    body = 'HUSTLEWATCH | MONEYLINE SIGNALS\n\n' + '\n\n'.join(lines) if lines else (
-        f'HUSTLEWATCH SPORTS | NO NEW QUALIFYING PICKS\n{len(markets)} pregame moneylines; {matched} exact book matches.\n'
-        f'{len(picks)} qualifying signals before duplicate filtering. No forced picks.')
-    if not lines and not picks and targets:
-        best = sorted(targets, key=lambda p: p['edge'], reverse=True)[:2]
-        body += '\n\nClosest entry targets (PASS at current price):\n' + '\n'.join(
-            f"{p['team']} ML vs {p['opponent']}: now {p['cost']*100:.1f}¢; enter only at/below {p['limit']*100:.1f}¢"
-            for p in best)
-    body += '\nModel estimate, not a proven edge. Pregame only; verify price and size in app.'
-    print(f'Sports: discovered={len(markets)} matched={matched} qualifying={len(picks)} new={len(fresh)}')
+    if len(selected) < 10:
+        lines.append(f'Only {len(selected)} games have verified comparison data. Other candidates below are UNRATED/PASS.')
+    if errors:
+        lines.append(f'Degraded coverage: {len(errors)} market quote requests failed.')
+    if extras:
+        lines.append('OTHER SPORTS | UNRATED / PASS: no verified book edge.\n' + '\n'.join(
+            f"{p['league']} | {'STARTED (status unverified)' if stamp(p['start']) <= now else 'UPCOMING'} | {p['team']} ML vs {p['opponent']} | {p['cost']*100:.1f}¢\nhttps://polymarket.us/market/{p['slug']}" for p in extras))
+    lines.append('Discovered leagues (all open sports): ' + ', '.join(sorted(present)))
+    lines.append('Model estimates; verify live price in app. No bets placed.')
+    body = '\n\n'.join(lines)
+    print(f'Sports: discovered={len(markets)} matched={matched} live={live_markets} qualifying={len(picks)} reported={len(selected)} errors={len(errors)}')
     def delivered():
-        for p in fresh:
+        for p in selected:
             state['alerts'][p['id']] = {'cost': p['cost'], 'time': now.isoformat()}
         state['alerts'] = {k:v for k,v in state['alerts'].items() if stamp(v['time']) and now - stamp(v['time']) < timedelta(days=3)}
         state_path.write_text(json.dumps(state, indent=2) + '\n')
-    return body[:3900], delivered
+    return body, delivered

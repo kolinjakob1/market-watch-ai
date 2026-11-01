@@ -30,7 +30,7 @@ jobs:
           ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          WATCHLIST: AAPL,NVDA,TSLA,SPY,QQQ
+          WATCHLIST: AAPL,NVDA,TSLA,SPY,QQQ,MSFT,AMZN,META,GOOGL,AMD,AVGO,NFLX,PLTR,COIN,MSTR,HOOD,SOFI,INTC,MU,UBER,BABA,JPM,BAC,XOM,COST,WMT,DIS,IWM,DIA,SMH
         run: python robinhood_scanner.py
       - name: Persist paper ledger
         if: always()

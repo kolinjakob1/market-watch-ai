@@ -54,10 +54,23 @@ def price(amount):
         return None
 
 def send_telegram(token, chat_id, message):
-    result = request_json(requests.post, f'https://api.telegram.org/bot{token}/sendMessage',
-        'Telegram', json={'chat_id':chat_id, 'text':message, 'disable_web_page_preview':True})
-    if not isinstance(result, dict) or result.get('ok') is not True:
-        raise ScannerError('Telegram did not confirm delivery')
+    # Telegram's 4096-character limit must not silently remove ranked picks.
+    chunks, chunk = [], ''
+    for line in message.splitlines(keepends=True):
+        while len(line) > 3900:
+            if chunk:
+                chunks.append(chunk); chunk = ''
+            chunks.append(line[:3900]); line = line[3900:]
+        if len(chunk) + len(line) > 3900:
+            chunks.append(chunk); chunk = ''
+        chunk += line
+    if chunk:
+        chunks.append(chunk)
+    for chunk in chunks:
+        result = request_json(requests.post, f'https://api.telegram.org/bot{token}/sendMessage',
+            'Telegram', json={'chat_id':chat_id, 'text':chunk, 'disable_web_page_preview':True})
+        if not isinstance(result, dict) or result.get('ok') is not True:
+            raise ScannerError('Telegram did not confirm delivery')
 
 def main():
     dry_run = '--dry-run' in sys.argv

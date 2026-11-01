@@ -2,6 +2,8 @@
 name: HustleWatch Crypto Signals
 
 on:
+  push:
+    paths: ['crypto_scanner.py', '.github/workflows/crypto.yml']
   workflow_dispatch:
   schedule:
     - cron: '3-58/5 * * * *'
@@ -38,6 +40,7 @@ jobs:
         run: python crypto_scanner.py
 
       - name: Persist paper ledger
+        if: always()
         run: |
           if git status --porcelain -- crypto_state.json | grep -q .; then
             git config user.name "github-actions[bot]"
