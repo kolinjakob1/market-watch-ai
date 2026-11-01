@@ -1,119 +1,142 @@
-"""Stock + options watchlist scanner. Research/paper only; never places orders."""
+
+"""HustleWatch: stocks, options and crypto market observations to Telegram.
+No broker orders; no performance or profitability claims.
+"""
 import os
 import sys
 from datetime import datetime, timezone
-
 import requests
 
-API = "https://data.alpaca.markets"
-SYMBOLS = [s.strip().upper() for s in os.getenv("WATCHLIST", "AAPL,NVDA,TSLA,SPY,QQQ").split(",") if s.strip()]
-ALERT_MOVE_PCT = float(os.getenv("ALERT_MOVE_PCT", "2"))
-MAX_QUOTE_AGE = 180  # seconds
-PAPER_BALANCE = 500.0  # reference bankroll, not persistent cash accounting
-
-
-def age_seconds(timestamp):
-    try:
-        dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-        return (datetime.now(timezone.utc) - dt).total_seconds()
-    except (TypeError, ValueError, AttributeError):
-        return float("inf")
+API = 'https://data.alpaca.markets'
+KEY = os.environ.get('ALPACA_API_KEY', '')
+SECRET = os.environ.get('ALPACA_SECRET_KEY', '')
+STOCKS = [x.strip().upper() for x in os.environ.get('WATCHLIST', 'AAPL,NVDA,TSLA,SPY,QQQ').split(',') if x.strip()]
+CRYPTOS = ['BTC/USD', 'ETH/USD', 'SOL/USD']
+TIMEOUT = 20
 
 
 def get_json(path, params):
-    response = requests.get(
-        API + path,
-        headers={"APCA-API-KEY-ID": os.environ["ALPACA_API_KEY"],
-                 "APCA-API-SECRET-KEY": os.environ["ALPACA_SECRET_KEY"]},
-        params=params, timeout=20)
+    response = requests.get(API + path, params=params, headers={
+        'APCA-API-KEY-ID': KEY, 'APCA-API-SECRET-KEY': SECRET
+    }, timeout=TIMEOUT)
     response.raise_for_status()
     return response.json()
 
 
-def send_alert(message):
-    if os.getenv("DRY_RUN") == "1":
-        print(message)
-        return
-    response = requests.post(
-        "https://api.telegram.org/bot" + os.environ["TELEGRAM_BOT_TOKEN"] + "/sendMessage",
-        json={"chat_id": os.environ["TELEGRAM_CHAT_ID"],
-              "text": message, "disable_web_page_preview": True}, timeout=20)
-    response.raise_for_status()
-    if not response.json().get("ok"):
-        raise RuntimeError("Telegram rejected the message")
+def fresh(timestamp, max_age=240):
+    if not timestamp:
+        return False
+    try:
+        when = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+        age = (datetime.now(timezone.utc) - when).total_seconds()
+        return -15 <= age <= max_age
+    except (ValueError, TypeError, AttributeError):
+        return False
 
 
-def scan_stocks():
-    data = get_json("/v2/stocks/snapshots", {"symbols": ",".join(SYMBOLS), "feed": "iex"})
-    signals = []
-    for symbol in SYMBOLS:
+def stock_alerts():
+    data = get_json('/v2/stocks/snapshots', {'symbols': ','.join(STOCKS), 'feed': 'iex'})
+    alerts = []
+    for symbol in STOCKS:
         snap = data.get(symbol) or {}
-        quote, today, prev = snap.get("latestQuote") or {}, snap.get("dailyBar") or {}, snap.get("prevDailyBar") or {}
-        bid, ask = quote.get("bp") or 0, quote.get("ap") or 0
-        prev_close = prev.get("c") or 0
-        if not (bid > 0 and ask >= bid and prev_close > 0):
+        quote = snap.get('latestQuote') or {}
+        prev = snap.get('prevDailyBar') or {}
+        bid, ask, prior = quote.get('bp') or 0, quote.get('ap') or 0, prev.get('c') or 0
+        if bid <= 0 or ask < bid or prior <= 0 or not fresh(quote.get('t')):
             continue
-        age = age_seconds(quote.get("t"))
-        if age < -10 or age > MAX_QUOTE_AGE:
-            continue
+        move = (ask / prior - 1) * 100
         spread = (ask - bid) / ask * 100
-        move = (ask / prev_close - 1) * 100
-        if spread > 0.35 or abs(move) < ALERT_MOVE_PCT:
-            continue
-        paper_budget = min(25.0, PAPER_BALANCE * 0.05)
-        shares = int(paper_budget // ask)
-        signals.append((symbol, move, f"STOCK WATCH | {symbol}\n"
-            f"IEX ask ${ask:.2f} | bid ${bid:.2f} | quote {age:.0f}s old\n"
-            f"Change vs prior close: {move:+.1f}% | spread {spread:.2f}%\n"
-            f"Paper budget ${paper_budget:.2f} ({shares} whole shares at ask)\n"
-            "Momentum alert only, not a verified profitable trade."))
-    return sorted(signals, key=lambda x: -abs(x[1]))[:3]
+        if abs(move) >= 2 and spread <= 0.35:
+            alerts.append((abs(move), f'STOCK | {symbol}: ${ask:.2f} | {move:+.1f}% vs prior close | spread {spread:.2f}%'))
+    return [text for _, text in sorted(alerts, reverse=True)[:3]]
 
 
-def scan_options():
-    results = []
-    for symbol in SYMBOLS[:3]:
+def options_alerts():
+    alerts = []
+    for symbol in STOCKS[:3]:
         try:
-            data = get_json(f"/v1beta1/options/snapshots/{symbol}", {"feed": "indicative", "limit": 100})
-        except requests.HTTPError:
-            print(f"Options feed unavailable for {symbol}; continuing stock scan.")
+            data = get_json(f'/v1beta1/options/snapshots/{symbol}', {'feed': 'indicative', 'limit': 100})
+        except requests.HTTPError as exc:
+            print(f'Options {symbol} unavailable: HTTP {exc.response.status_code}')
             continue
-        snapshots = data.get("snapshots") or {}
-        count = 0
-        for contract, snap in snapshots.items():
-            quote = snap.get("latestQuote") or {}
-            bid, ask = quote.get("bp") or 0, quote.get("ap") or 0
-            if not (bid > 0 and ask >= bid):
+        picks = []
+        for contract, snap in (data.get('snapshots') or {}).items():
+            quote = snap.get('latestQuote') or {}
+            bid, ask = quote.get('bp') or 0, quote.get('ap') or 0
+            if bid <= 0 or ask < bid or ask <= 0:
                 continue
             spread = (ask - bid) / ask * 100
             if spread > 10:
                 continue
-            count += 1
-        if count:
-            results.append(f"OPTIONS WATCH | {symbol}: {count} indicative contracts with displayed spread <=10%. "
-                "Indicative quotes are modified/not executable; confirm real broker quotes before any trade.")
-    return results
+            # OCC format: underlying + YYMMDD + C/P + 8-digit strike (1/1000 USD).
+            tail = contract[-15:]
+            if len(tail) != 15 or tail[6] not in 'CP':
+                continue
+            try:
+                expiry = f'20{tail[:2]}-{tail[2:4]}-{tail[4:6]}'
+                strike = int(tail[7:]) / 1000
+            except ValueError:
+                continue
+            kind = 'CALL' if tail[6] == 'C' else 'PUT'
+            picks.append((spread, f'OPTION | {symbol} {kind} ${strike:g} exp {expiry} | bid ${bid:.2f} ask ${ask:.2f} | spread {spread:.1f}%'))
+        if picks:
+            alerts.append(min(picks, key=lambda x: x[0])[1])
+    return alerts
+
+
+def crypto_alerts():
+    try:
+        data = get_json('/v1beta3/crypto/us/snapshots', {'symbols': ','.join(CRYPTOS)})
+    except requests.HTTPError as exc:
+        print(f'Crypto unavailable: HTTP {exc.response.status_code}')
+        return []
+    snapshots = data.get('snapshots') or {}
+    alerts = []
+    for symbol in CRYPTOS:
+        quote = (snapshots.get(symbol) or {}).get('latestQuote') or {}
+        bid, ask = quote.get('bp') or 0, quote.get('ap') or 0
+        if bid > 0 and ask >= bid and fresh(quote.get('t'), max_age=600):
+            alerts.append(f'CRYPTO | {symbol} | bid ${bid:,.2f} ask ${ask:,.2f}')
+    return alerts
+
+
+def telegram(message):
+    token = os.environ['TELEGRAM_BOT_TOKEN']
+    chat_id = os.environ['TELEGRAM_CHAT_ID']
+    if os.environ.get('DRY_RUN') == '1':
+        print(message)
+        return
+    response = requests.post(f'https://api.telegram.org/bot{token}/sendMessage', json={
+        'chat_id': chat_id, 'text': message, 'disable_web_page_preview': True
+    }, timeout=TIMEOUT)
+    response.raise_for_status()
+    if not response.json().get('ok'):
+        raise RuntimeError('Telegram rejected message')
 
 
 def main():
-    if not os.getenv("ALPACA_API_KEY") or not os.getenv("ALPACA_SECRET_KEY"):
-        raise RuntimeError("Set ALPACA_API_KEY and ALPACA_SECRET_KEY secrets")
-    stocks = scan_stocks()
-    for _, _, message in stocks:
-        send_alert(message)
-    # Options are research-only; avoid recommending contracts based on indicative prices.
-    options = scan_options()
-    print(f"Scan complete: {len(stocks)} stock signals; options coverage: {len(options)} symbols")
-    for message in options:
-        print(message)
-    if not stocks:
-        print("NO TRADE SIGNAL: no fresh stock setups met screening rules")
+    if not KEY or not SECRET:
+        raise RuntimeError('Alpaca credentials missing')
+    sections = []
+    for name, scanner in [('stocks', stock_alerts), ('options', options_alerts), ('crypto', crypto_alerts)]:
+        try:
+            results = scanner()
+            sections.extend(results)
+            print(f'{name}: {len(results)} observations')
+        except (requests.RequestException, ValueError, KeyError, TypeError) as exc:
+            print(f'{name} feed error: {type(exc).__name__}')
+            sections.append(f'{name.upper()} | feed unavailable this scan')
+    stamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
+    message = 'HUSTLEWATCH | ' + stamp + '\nPaper reference: $500 | No orders placed\n\n'
+    message += '\n'.join(sections) if sections else 'NO QUALIFYING OBSERVATIONS'
+    message += '\n\nWATCH ONLY. Indicative option quotes are not executable; verify in Robinhood. No proven trading edge.'
+    telegram(message[:3900])
+    print('Telegram report sent')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     try:
         main()
     except Exception as exc:
-        # Do not print API credentials or full request URLs.
-        print(f"Scanner failed ({type(exc).__name__}). Check Actions logs and secrets.", file=sys.stderr)
+        print(f'Scanner failed: {type(exc).__name__}', file=sys.stderr)
         sys.exit(1)
