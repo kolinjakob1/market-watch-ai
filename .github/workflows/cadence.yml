@@ -7,6 +7,7 @@ on:
         required: false
         type: string
   push:
+    branches: [main]
     paths: ['cadence_scheduler.py', 'test_cadence.py', '.github/workflows/cadence.yml']
   schedule:
     - cron: '11 * * * *'

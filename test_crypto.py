@@ -27,5 +27,18 @@ class PaperExplorationTests(unittest.TestCase):
         self.assertEqual(state['cash'] + p['spent'], 500.0)
 
 
+    def test_strategy_attribution_survives_entry_and_exit(self):
+        now = datetime(2026, 11, 1, 21, 30, tzinfo=timezone.utc)
+        state = {'cash': 500., 'positions': {}, 'closed': [], 'cooldown': {}}
+        q = {'t': c.iso(now), 'bp': 99.9, 'ap': 100}
+        candidate = {'stop': 99, 'target': 102, 'bar': c.iso(now-timedelta(minutes=5)),
+                     'strategy': 'trend', 'rsi': 55, 'volume_multiple': 1}
+        with patch.object(c,'SCAN_TIME',now), patch.object(c,'SYMBOLS',['BTC/USD']), patch.object(c,'setup',return_value=candidate):
+            c.process(state, {'BTC/USD': []}, {'BTC/USD': q})
+            self.assertEqual(state['positions']['BTC/USD']['strategy'], 'trend')
+            q['bp'], q['ap'] = 98.9, 99
+            c.process(state, {'BTC/USD': []}, {'BTC/USD': q})
+        self.assertEqual(state['closed'][0]['strategy'], 'trend')
+
 if __name__ == '__main__':
     unittest.main()

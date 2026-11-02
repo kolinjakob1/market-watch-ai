@@ -12,7 +12,7 @@ from urllib import request, error
 
 WORKFLOW = 'cadence.yml'
 CADENCES = {'crypto.yml': (300, 180), 'scanner.yml': (600, 120),
-            'robinhood.yml': (300, 240)}
+            'robinhood.yml': (300, 240), 'news.yml': (600, 360)}
 
 
 def utc(epoch):
@@ -73,14 +73,16 @@ def run(github, duration, bootstrap=False, cursor=None, now=time.time, sleep=tim
     deadline = start + duration
     due = {name: next_slot(start, *cadence) for name, cadence in CADENCES.items()}
     if cursor:
-        if set(cursor) != set(CADENCES) or not all(isinstance(v, (int, float)) and math.isfinite(v) and v > 0 for v in cursor.values()):
+        # Accept the original three-workflow cursor during a rolling upgrade.
+        required = set(CADENCES) - {'news.yml'}
+        if not required <= set(cursor) <= set(CADENCES) or not all(type(v) in (int, float) and math.isfinite(v) and v > 0 for v in cursor.values()):
             raise ValueError('Invalid resume cursor')
         due.update(cursor)
     retry_at = {}
     failures = {}
     if bootstrap:
         # Immediate initial scans; later sessions preserve fixed wall-clock slots.
-        for name in ('crypto.yml', 'scanner.yml'):
+        for name in ('crypto.yml', 'scanner.yml', 'news.yml'):
             try:
                 github.dispatch(name)
                 print(f'DISPATCH bootstrap {name} accepted={utc(now())}', flush=True)

@@ -209,7 +209,8 @@ def process(state, bars, quotes):
         pnl = proceeds - pos['spent']
         state['cash'] += proceeds
         state['closed'].append({'symbol': symbol, 'entry': pos['entry'], 'exit': bid,
-                                'pnl': round(pnl, 2), 'time': iso(SCAN_TIME), 'reason': reason})
+                                'pnl': round(pnl, 2), 'time': iso(SCAN_TIME), 'reason': reason,
+                                'strategy': pos.get('strategy', 'legacy_unknown')})
         state['closed'] = state['closed'][-300:]
         del state['positions'][symbol]
         state['cooldown'][symbol] = iso(SCAN_TIME)
@@ -240,7 +241,8 @@ def process(state, bars, quotes):
         state['cash'] -= spent
         state['positions'][symbol] = {'qty': qty, 'entry': ask,
             'stop': candidate['stop'], 'target': candidate['target'],
-            'spent': spent, 'time': iso(SCAN_TIME), 'bar': candidate['bar']}
+            'spent': spent, 'time': iso(SCAN_TIME), 'bar': candidate['bar'],
+            'strategy': candidate.get('strategy', 'breakout')}
         events.append(f'PAPER BUY | {symbol}\n'
                       f'Simulated buy ${ask:,.2f} | target ${candidate["target"]:,.2f}\n'
                       f'Stop ${candidate["stop"]:,.2f} | allocation ${spent:.2f}\n'
@@ -284,7 +286,7 @@ def process(state, bars, quotes):
                 'strategy': 'exploration_paper'}
             events.append(f'EXPLORATORY PAPER BUY | {symbol} | simulated entry ${ask:,.4f}'
                           f' | allocated ${spent:.2f} | estimated planned risk <= $1'
-                          '\\nResearch sample only; NOT a recommended real-money trade.')
+                          '\nResearch sample only; NOT a recommended real-money trade.')
             break
     return events
 

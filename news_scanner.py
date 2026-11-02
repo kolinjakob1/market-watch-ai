@@ -40,7 +40,7 @@ def save(path, state):
 def fetch(now):
     headers = {'APCA-API-KEY-ID': required_env('ALPACA_API_KEY'),
                'APCA-API-SECRET-KEY': required_env('ALPACA_SECRET_KEY')}
-    params = {'start': (now - timedelta(hours=24)).isoformat(),
+    params = {'start': (now - timedelta(hours=2)).isoformat(),
               'sort': 'asc', 'limit': 50, 'include_content': 'false'}
     # Omit end: Alpaca chooses the latest time permitted by the account's feed.
     # Empty symbols means broad feed, including market-wide news.
