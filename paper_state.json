@@ -1,23 +1,9 @@
 {
   "version": 1,
   "initial": 500,
-  "cash": 100.00014500000005,
-  "realized": -4.611515,
+  "cash": 0.00017500000004133653,
+  "realized": -6.894117,
   "positions": [
-    {
-      "symbol": "BABA",
-      "underlying": "BABA",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 0.969715,
-      "entry": 103.12301999999998,
-      "cost": 99.999939,
-      "mark": 102.68721000000001,
-      "stop": 101.06055959999998,
-      "target": 107.24794079999998,
-      "opened_at": "2026-11-02T14:34:13.313007+00:00",
-      "strategy": "momentum-v1"
-    },
     {
       "symbol": "AMZN",
       "underlying": "AMZN",
@@ -26,7 +12,7 @@
       "quantity": 0.401028,
       "entry": 249.35911,
       "cost": 99.999985,
-      "mark": 250.27947,
+      "mark": 250.28946,
       "stop": 244.37192779999998,
       "target": 259.3334744,
       "opened_at": "2026-11-02T14:39:14.434984+00:00",
@@ -44,6 +30,20 @@
       "stop": 16.7943776,
       "target": 17.8226048,
       "opened_at": "2026-11-02T14:49:11.538476+00:00",
+      "strategy": "momentum-v1"
+    },
+    {
+      "symbol": "UBER",
+      "underlying": "UBER",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 1.486387,
+      "entry": 67.27720999999998,
+      "cost": 99.99997,
+      "mark": 67.12281,
+      "stop": 65.93166579999998,
+      "target": 69.96829839999998,
+      "opened_at": "2026-11-02T18:04:14.813046+00:00",
       "strategy": "momentum-v1"
     }
   ],
@@ -65,20 +65,43 @@
       "pnl": -4.611515,
       "closed_at": "2026-11-02T14:49:11.538476+00:00",
       "reason": "stop"
+    },
+    {
+      "symbol": "BABA",
+      "underlying": "BABA",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.969715,
+      "entry": 103.12301999999998,
+      "cost": 99.999939,
+      "mark": 100.76913,
+      "stop": 101.06055959999998,
+      "target": 107.24794079999998,
+      "opened_at": "2026-11-02T14:34:13.313007+00:00",
+      "strategy": "momentum-v1",
+      "exit": 100.76913,
+      "pnl": -2.282602,
+      "closed_at": "2026-11-02T18:04:14.813046+00:00",
+      "reason": "stop"
     }
   ],
   "last_entry": {
     "BABA": "2026-11-02",
     "AMZN": "2026-11-02",
     "MSTR": "2026-11-02",
-    "SOFI": "2026-11-02"
+    "SOFI": "2026-11-02",
+    "UBER": "2026-11-02"
   },
-  "updated_at": "2026-11-02T17:59:11.530958+00:00",
-  "equity": 495.60152,
+  "updated_at": "2026-11-02T18:04:14.813046+00:00",
+  "equity": 493.516038,
   "unsettled": [
     {
       "date": "2026-11-02",
       "amount": 95.38842
+    },
+    {
+      "date": "2026-11-02",
+      "amount": 97.717337
     }
   ]
 }
