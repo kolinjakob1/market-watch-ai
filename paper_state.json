@@ -1,11 +1,29 @@
 {
   "version": 1,
   "initial": 500,
-  "cash": 500,
+  "cash": 400.000061,
   "realized": 0,
-  "positions": [],
+  "positions": [
+    {
+      "symbol": "BABA",
+      "underlying": "BABA",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.969715,
+      "entry": 103.12301999999998,
+      "cost": 99.999939,
+      "mark": 102.84705,
+      "stop": 101.06055959999998,
+      "target": 107.24794079999998,
+      "opened_at": "2026-11-02T14:34:13.313007+00:00",
+      "strategy": "momentum-v1"
+    }
+  ],
   "closed": [],
-  "last_entry": {},
-  "updated_at": "2026-11-02T14:29:13.418765+00:00",
-  "equity": 500
+  "last_entry": {
+    "BABA": "2026-11-02"
+  },
+  "updated_at": "2026-11-02T14:34:13.313007+00:00",
+  "equity": 499.732388,
+  "unsettled": []
 }
