@@ -35,8 +35,8 @@ class CadenceTests(unittest.TestCase):
         self.assertTrue(clock.stock_slot(epoch('2026-11-01T16:14:00Z')))
     def test_real_ten_and_five_minute_intervals_without_drift(self):
         timer=FakeTime(epoch('2026-11-01T17:41:50Z'));gh=FakeGitHub(timer)
-        clock.run(gh,1300,now=timer.now,sleep=timer.sleep)
-        for workflow,interval in [('scanner.yml',600),('crypto.yml',300)]:
+        clock.run(gh,1500,now=timer.now,sleep=timer.sleep)
+        for workflow,interval in [('scanner.yml',600),('crypto.yml',300),('news.yml',600)]:
             starts=[t for name,t in gh.events if name==workflow]
             self.assertGreaterEqual(len(starts),3)
             self.assertTrue(all(b-a==interval for a,b in zip(starts,starts[1:])))
@@ -70,5 +70,19 @@ class CadenceTests(unittest.TestCase):
         timer=FakeTime(epoch('2026-11-01T17:41:50Z'));gh=FakeGitHub(timer)
         gh.handoff=Mock(side_effect=RuntimeError('permission denied'))
         with self.assertRaises(RuntimeError):clock.run(gh,1,now=timer.now,sleep=timer.sleep)
+
+    def test_rolling_upgrade_accepts_old_cursor_and_dispatches_news(self):
+        timer=FakeTime(epoch('2026-11-01T17:45:50Z'));gh=FakeGitHub(timer)
+        old={name:clock.next_slot(timer.now(),*cadence) for name,cadence in clock.CADENCES.items() if name!='news.yml'}
+        clock.run(gh,20,cursor=old,now=timer.now,sleep=timer.sleep)
+        self.assertEqual([name for name,t in gh.events],['news.yml'])
+        self.assertIn('news.yml',gh.cursor)
+
+    def test_unknown_or_invalid_resume_cursor_is_rejected(self):
+        timer=FakeTime(epoch('2026-11-01T17:45:50Z'));gh=FakeGitHub(timer)
+        cursor={name:1234 for name in clock.CADENCES}
+        for bad in (dict(cursor,unknown=1234),dict(cursor,**{'news.yml':True})):
+            with self.assertRaises(ValueError):
+                clock.run(gh,1,cursor=bad,now=timer.now,sleep=timer.sleep)
 
 if __name__=='__main__':unittest.main()

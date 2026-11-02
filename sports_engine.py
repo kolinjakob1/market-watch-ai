@@ -95,24 +95,30 @@ def match(market, events):
     return matches[0] if len(matches) == 1 else None
 
 
-def evaluate(m, bbo, event, now, min_edge=.03):
+def evaluate(m, bbo, event, now, min_edge=.03, diagnostics=None):
+    def reject(reason):
+        if diagnostics is not None:
+            diagnostics[reason] = diagnostics.get(reason, 0) + 1
+        return []
     live = bool(stamp(event.get('commence_time')) and stamp(event['commence_time']) <= now)
     if live:
         sample = stamp((bbo.get('lastPriceSample') or {}).get('ts'))
         if not sample or not -15 <= (now-sample).total_seconds() <= 30:
-            return []
+            return reject('stale live exchange sample')
     fair = consensus(event, now)
-    if not fair or bbo.get('state') != 'MARKET_STATE_OPEN':
-        return []
+    if not fair:
+        return reject('unverified book consensus')
+    if bbo.get('state') != 'MARKET_STATE_OPEN':
+        return reject('exchange market closed')
     bid, ask = price(bbo.get('bestBid')), price(bbo.get('bestAsk'))
     if bid is None or ask is None or bid > ask or ask - bid > .04:
-        return []
+        return reject('invalid or wide exchange quote')
     try:
         theta = float(m['feeCoefficient'])
         if not math.isfinite(theta) or not 0 <= theta <= .15:
-            return []
+            return reject('unknown or invalid fees')
     except (KeyError, ValueError, TypeError):
-        return []
+        return reject('unknown or invalid fees')
     picks = []
     for side in m['marketSides']:
         cost = float(ask if side['long'] else 1 - bid)
@@ -134,11 +140,14 @@ def evaluate(m, bbo, event, now, min_edge=.03):
                           'team': name, 'opponent': event['away_team'] if norm(name) == norm(event['home_team']) else event['home_team'],
                           'start': event['commence_time'], 'cost': cost, 'limit': limit,
                           'fair': p, 'edge': edge, 'books': fair[1]})
+    if not picks:
+        return reject('price band or edge rules')
     return picks
 
 
 def run(now):
     markets = discover(now)
+    diagnostics = {}
     # Only fetch leagues represented on the exchange, one request per league per scan.
     leagues = {'nfl': 'americanfootball_nfl', 'nba': 'basketball_nba', 'nhl': 'icehockey_nhl',
                'mlb': 'baseball_mlb', 'ncaaf': 'americanfootball_ncaaf', 'ncaab': 'basketball_ncaab',
@@ -191,7 +200,7 @@ def run(now):
         except ScannerError as exc:
             errors.append(str(exc))
             continue
-        assessed = evaluate(m, data.get('marketData') or {}, e, checked, min_edge=-1)
+        assessed = evaluate(m, data.get('marketData') or {}, e, checked, min_edge=-1, diagnostics=diagnostics)
         if not assessed:
             continue
         # One direction per game. Never pad the report with both opposing teams.
@@ -265,6 +274,10 @@ def run(now):
                      f"https://polymarket.us/market/{p['slug']}")
     if len(selected) < 10:
         lines.append(f'Only {len(selected)} games have verified comparison data. Other candidates below are UNRATED/PASS.')
+    lines.append(f'Coverage: {len(markets)-matched} markets without an exact book match; '
+                 f'{len(targets)-len(picks)} assessed games below BUY edge.')
+    if diagnostics:
+        lines.append('Matched-market blocks: ' + '; '.join(f'{reason}: {count}' for reason, count in sorted(diagnostics.items())))
     if errors:
         lines.append(f'Degraded coverage: {len(errors)} market quote requests failed.')
     if extras:

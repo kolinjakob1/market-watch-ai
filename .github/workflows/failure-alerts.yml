@@ -8,6 +8,7 @@ on:
       - Sports Odds Scanner
       - Stock and Options Scanner
       - HustleWatch Crypto Signals
+      - HustleWatch News Alerts
     types:
       - completed
 

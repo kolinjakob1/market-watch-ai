@@ -17,6 +17,17 @@ class Repairs(unittest.TestCase):
             rows.append(m)
         with patch.object(sports,'request_json',return_value={'markets':rows}):
             self.assertEqual({m['id'] for m in sports.discover(NOW)},{'-2','2'})
+    def test_rejection_diagnostics_distinguish_consensus_and_quote_failures(self):
+        bbo={'state':'MARKET_STATE_OPEN','bestBid':{'value':'.49','currency':'USD'},
+             'bestAsk':{'value':'.50','currency':'USD'}}
+        e=event();e['bookmakers']=e['bookmakers'][:2]
+        diagnostics={}
+        self.assertEqual(sports.evaluate(market(),bbo,e,NOW,diagnostics=diagnostics),[])
+        self.assertEqual(diagnostics,{'unverified book consensus':1})
+        bbo['bestAsk']['value']='.80'
+        sports.evaluate(market(),bbo,event(),NOW,diagnostics=diagnostics)
+        self.assertEqual(diagnostics['invalid or wide exchange quote'],1)
+
     def test_live_needs_fresh_book_and_exchange_samples(self):
         e=event();e['commence_time']=(NOW-timedelta(hours=1)).isoformat()
         bbo={'state':'MARKET_STATE_OPEN','bestBid':{'value':'.49','currency':'USD'},

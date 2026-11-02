@@ -1,0 +1,61 @@
+name: HustleWatch News Alerts
+on:
+  workflow_dispatch:
+    inputs:
+      deliver:
+        description: Send Telegram alerts and persist accepted IDs (otherwise preview only)
+        type: boolean
+        default: true
+  push:
+    branches: [main, codex/news-scanner-preview-20261102]
+    paths: ['news_scanner.py', 'test_news.py', '.github/workflows/news.yml']
+permissions:
+  contents: write
+concurrency:
+  group: hustlewatch-news-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  news:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - run: python -m unittest -v
+      - name: Read stock and crypto news
+        env:
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          DELIVER: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.deliver) }}
+        run: |
+          if [ "$DELIVER" = 'true' ]; then
+            python news_scanner.py
+          else
+            python news_scanner.py --dry-run
+          fi
+      - name: Persist accepted news IDs even after a partial delivery failure
+        if: always() && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.deliver))
+        run: |
+          if [ -f news_state.json ]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email 'github-actions[bot]@users.noreply.github.com'
+            git add news_state.json
+            if ! git diff --cached --quiet; then
+              git commit -m 'Persist accepted news alerts [skip ci]'
+              for attempt in 1 2 3; do
+                git pull --rebase && git push && exit 0
+              done
+              exit 1
+            fi
+          fi
+      - name: Report failed news scan
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python failure_fallback.py
