@@ -87,13 +87,13 @@ class SportsReportTests(unittest.TestCase):
                     'bestAsk':{'value':'.50','currency':'USD'},'lastPriceSample':{'ts':NOW.isoformat()}}}
         with tempfile.TemporaryDirectory() as tmp,patch.object(sports,'discover',return_value=markets),patch.object(sports,'request_json',side_effect=api),patch.object(sports,'required_env',return_value='fake'),patch.object(sports,'Path',return_value=Path(tmp)/'sports.json'):
             body,delivered=sports.run(NOW)
-            self.assertIn('10 RANKED CANDIDATES',body)
-            self.assertIn('LIVE | BUY',body)
-            self.assertEqual(body.count('Select '),10)
+            self.assertIn('10 ranked',body)
+            self.assertIn('BUY Boston Celtics0 ML',body)
+            self.assertEqual(body.count(' ML vs '),10)
             delivered()
             repeated, _ = sports.run(NOW)
-            self.assertIn('10 RANKED CANDIDATES', repeated)
-            self.assertEqual(repeated.count('Select '), 10)
+            self.assertIn('10 ranked', repeated)
+            self.assertEqual(repeated.count(' ML vs '), 10)
 
 class CryptoScheduleTests(unittest.TestCase):
     def test_recent_breakout_survives_late_scan_without_chasing(self):
