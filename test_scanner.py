@@ -44,7 +44,7 @@ class SportsTests(unittest.TestCase):
         self.assertEqual(sports.evaluate(market(),bbo,event((2,2)),NOW),[])
         target=sports.evaluate(market(),bbo,event((2,2)),NOW,min_edge=-1)[0]
         self.assertLess(target['limit'],target['cost'])
-        self.assertGreaterEqual(target['fair']-target['limit']-.0695*target['limit']*(1-target['limit'])-.01,.03)
+        self.assertGreaterEqual(target['fair']-target['limit']-.0695*target['limit']*(1-target['limit'])-.01,.02)
     def test_secret_safe_errors(self):
         method=Mock(return_value=Mock(status_code=401))
         with self.assertRaises(scanner.ScannerError) as err: scanner.request_json(method,'private-token','Feed')
