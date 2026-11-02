@@ -95,7 +95,7 @@ def match(market, events):
     return matches[0] if len(matches) == 1 else None
 
 
-def evaluate(m, bbo, event, now, min_edge=.03, diagnostics=None):
+def evaluate(m, bbo, event, now, min_edge=.02, diagnostics=None):
     def reject(reason):
         if diagnostics is not None:
             diagnostics[reason] = diagnostics.get(reason, 0) + 1
@@ -131,7 +131,7 @@ def evaluate(m, bbo, event, now, min_edge=.03, diagnostics=None):
             low, high = 0., 1.
             for _ in range(32):
                 mid = (low + high) / 2
-                if p - mid - theta * mid * (1-mid) - .01 >= .03:
+                if p - mid - theta * mid * (1-mid) - .01 >= min_edge:
                     low = mid
                 else:
                     high = mid
@@ -210,13 +210,13 @@ def run(now):
         p['checked'] = checked.isoformat()
         targets.append(p)
     targets.sort(key=lambda p: p['edge'], reverse=True)
-    picks = [p for p in targets if p['edge'] >= .03]
+    picks = [p for p in targets if p['edge'] >= .02]
     # Explain why the leading assessed candidates are not actionable.
     # Never manufacture BUY selections from a fixed report quota.
     if targets:
         best = targets[0]
         print(f"Sports best net edge={best['edge']*100:+.2f} cents; "
-              f"short of BUY cutoff by {max(0, .03-best['edge'])*100:.2f} cents")
+              f"short of BUY cutoff by {max(0, .02-best['edge'])*100:.2f} cents")
     else:
         print('Sports: no book-verified, quote-valid candidate available for evaluation')
     # Preserve live coverage alongside upcoming games when both exist.
@@ -260,32 +260,25 @@ def run(now):
     state_path = Path('sports_state.json')
     state = json.loads(state_path.read_text()) if state_path.exists() else {'alerts': {}}
     # Repeat the ranked report each scan, as requested; state is history, not suppression.
-    lines = [f'HUSTLEWATCH SPORTS | {len(selected)} RANKED CANDIDATES',
-             now.astimezone(ZoneInfo('America/Los_Angeles')).strftime('%a %-I:%M %p PT'),
-             f'{len(picks)} qualify | {matched} matched games ({live_markets} live)',
-             'BUY = meets model rules. PASS = wait; do not buy now.']
+    lines = [f'SPORTS | {len(picks)} BUY / {len(selected)} ranked | ' +
+             now.astimezone(ZoneInfo('America/Los_Angeles')).strftime('%-I:%M %p PT'),
+             'BUY = net edge >= 2¢. PASS = no bet at this price.']
     for i, p in enumerate(selected, 1):
-        when = stamp(p['start']).astimezone(ZoneInfo('America/Los_Angeles')).strftime('%a %-I:%M %p PT')
-        label = 'LIVE' if p['live'] else 'UPCOMING'
-        action = 'BUY' if p['edge'] >= .03 else 'PASS'
-        lines.append(f"{i}. {p['league']} | {label} | {action} {p['team']} ML\nvs {p['opponent']} | {when}\n"
-                     f"Select {p['team']} to WIN. Now {p['cost']*100:.1f}¢; max entry {p['limit']*100:.1f}¢\n"
-                     f"Book estimate {p['fair']:.0%}; net edge {p['edge']*100:+.1f}¢ ({p['books']} books)\n"
-                     f"https://polymarket.us/market/{p['slug']}")
+        when = 'LIVE' if p['live'] else stamp(p['start']).astimezone(
+            ZoneInfo('America/Los_Angeles')).strftime('%a %-I:%M%p')
+        action = 'BUY' if p['edge'] >= .02 else 'PASS'
+        lines.append(
+            f"{i}. {action} {p['team']} ML vs {p['opponent']} | {p['league']} {when} | "
+            f"Now {p['cost']*100:.1f}¢ / Max {p['limit']*100:.1f}¢ | "
+            f"Edge {p['edge']*100:+.1f}¢ | https://polymarket.us/market/{p['slug']}")
     if len(selected) < 10:
-        lines.append(f'Only {len(selected)} games have verified comparison data. Other candidates below are UNRATED/PASS.')
-    lines.append(f'Coverage: {len(markets)-matched} markets without an exact book match; '
-                 f'{len(targets)-len(picks)} assessed games below BUY edge.')
-    if diagnostics:
-        lines.append('Matched-market blocks: ' + '; '.join(f'{reason}: {count}' for reason, count in sorted(diagnostics.items())))
+        lines.append(f'Only {len(selected)} verified matches; no forced picks.')
     if errors:
-        lines.append(f'Degraded coverage: {len(errors)} market quote requests failed.')
-    if extras:
-        lines.append('OTHER SPORTS | UNRATED / PASS: no verified book edge.\n' + '\n'.join(
-            f"{p['league']} | {'STARTED (status unverified)' if stamp(p['start']) <= now else 'UPCOMING'} | {p['team']} ML vs {p['opponent']} | {p['cost']*100:.1f}¢\nhttps://polymarket.us/market/{p['slug']}" for p in extras))
-    lines.append('Discovered leagues (all open sports): ' + ', '.join(sorted(present)))
-    lines.append('Model estimates; verify live price in app. No bets placed.')
-    body = '\n\n'.join(lines)
+        lines.append(f'Warning: {len(errors)} quote requests failed.')
+    if not selected:
+        lines.append(f'No verified picks. {matched} matched; {len(markets)} markets checked.')
+    lines.append('Estimates only. Check price before acting. No bets placed.')
+    body = '\n'.join(lines)
     print(f'Sports: discovered={len(markets)} matched={matched} live={live_markets} qualifying={len(picks)} reported={len(selected)} errors={len(errors)}')
     def delivered():
         for p in selected:
