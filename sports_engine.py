@@ -131,7 +131,7 @@ def evaluate(m, bbo, event, now, min_edge=.02, diagnostics=None):
             low, high = 0., 1.
             for _ in range(32):
                 mid = (low + high) / 2
-                if p - mid - theta * mid * (1-mid) - .01 >= min_edge:
+                if p - mid - theta * mid * (1-mid) - .01 >= .02:
                     low = mid
                 else:
                     high = mid
