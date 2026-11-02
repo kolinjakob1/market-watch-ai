@@ -31,7 +31,7 @@ jobs:
           ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          DELIVER: ${{ github.event_name == 'workflow_dispatch' && inputs.deliver }}
+          DELIVER: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.deliver) }}
         run: |
           if [ "$DELIVER" = 'true' ]; then
             python news_scanner.py
@@ -39,7 +39,7 @@ jobs:
             python news_scanner.py --dry-run
           fi
       - name: Persist accepted news IDs even after a partial delivery failure
-        if: always() && github.event_name == 'workflow_dispatch' && inputs.deliver
+        if: always() && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.deliver))
         run: |
           if [ -f news_state.json ]; then
             git config user.name 'github-actions[bot]'
