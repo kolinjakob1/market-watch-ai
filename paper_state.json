@@ -1,7 +1,7 @@
 {
   "version": 1,
   "initial": 500,
-  "cash": 400.000061,
+  "cash": 200.00014100000004,
   "realized": 0,
   "positions": [
     {
@@ -12,18 +12,48 @@
       "quantity": 0.969715,
       "entry": 103.12301999999998,
       "cost": 99.999939,
-      "mark": 102.84705,
+      "mark": 102.90699000000001,
       "stop": 101.06055959999998,
       "target": 107.24794079999998,
       "opened_at": "2026-11-02T14:34:13.313007+00:00",
+      "strategy": "momentum-v1"
+    },
+    {
+      "symbol": "AMZN",
+      "underlying": "AMZN",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.401028,
+      "entry": 249.35911,
+      "cost": 99.999985,
+      "mark": 248.77098,
+      "stop": 244.37192779999998,
+      "target": 259.3334744,
+      "opened_at": "2026-11-02T14:39:14.434984+00:00",
+      "strategy": "momentum-v1"
+    },
+    {
+      "symbol": "MSTR",
+      "underlying": "MSTR",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.745968,
+      "entry": 134.05391999999998,
+      "cost": 99.999935,
+      "mark": 133.48638,
+      "stop": 131.3728416,
+      "target": 139.41607679999998,
+      "opened_at": "2026-11-02T14:39:14.434984+00:00",
       "strategy": "momentum-v1"
     }
   ],
   "closed": [],
   "last_entry": {
-    "BABA": "2026-11-02"
+    "BABA": "2026-11-02",
+    "AMZN": "2026-11-02",
+    "MSTR": "2026-11-02"
   },
-  "updated_at": "2026-11-02T14:34:13.313007+00:00",
-  "equity": 499.732388,
+  "updated_at": "2026-11-02T14:39:14.434984+00:00",
+  "equity": 499.131289,
   "unsettled": []
 }
