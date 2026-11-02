@@ -1,7 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
-from datetime import timedelta
+from datetime import datetime, timedelta
 from unittest.mock import patch, Mock
 from test_scanner import NOW, event, market
 import scanner
@@ -85,7 +85,9 @@ class SportsReportTests(unittest.TestCase):
             if url.endswith('/odds'):return events
             return {'marketData':{'state':'MARKET_STATE_OPEN','bestBid':{'value':'.49','currency':'USD'},
                     'bestAsk':{'value':'.50','currency':'USD'},'lastPriceSample':{'ts':NOW.isoformat()}}}
-        with tempfile.TemporaryDirectory() as tmp,patch.object(sports,'discover',return_value=markets),patch.object(sports,'request_json',side_effect=api),patch.object(sports,'required_env',return_value='fake'),patch.object(sports,'Path',return_value=Path(tmp)/'sports.json'):
+        with tempfile.TemporaryDirectory() as tmp,patch.object(sports,'discover',return_value=markets),patch.object(sports,'request_json',side_effect=api),patch.object(sports,'required_env',return_value='fake'),patch.object(sports,'Path',return_value=Path(tmp)/'sports.json'),patch.object(sports,'datetime',wraps=datetime) as clock:
+            # Keep the fixture's book/quote timestamps aligned with the simulated scan clock.
+            clock.now.return_value=NOW
             body,delivered=sports.run(NOW)
             self.assertIn('10 ranked',body)
             self.assertIn('BUY Boston Celtics0 ML',body)
