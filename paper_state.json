@@ -2,37 +2,8 @@
   "version": 1,
   "initial": 500,
   "cash": 0.00017500000004133653,
-  "realized": -8.901046,
-  "positions": [
-    {
-      "symbol": "AMZN",
-      "underlying": "AMZN",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 0.401028,
-      "entry": 249.35911,
-      "cost": 99.999985,
-      "mark": 246.13362,
-      "stop": 244.37192779999998,
-      "target": 259.3334744,
-      "opened_at": "2026-11-02T14:39:14.434984+00:00",
-      "strategy": "momentum-v1"
-    },
-    {
-      "symbol": "UBER",
-      "underlying": "UBER",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 1.486387,
-      "entry": 67.27720999999998,
-      "cost": 99.99997,
-      "mark": 66.36357000000001,
-      "stop": 65.93166579999998,
-      "target": 69.96829839999998,
-      "opened_at": "2026-11-02T18:04:14.813046+00:00",
-      "strategy": "momentum-v1"
-    }
-  ],
+  "realized": -11.220021,
+  "positions": [],
   "closed": [
     {
       "symbol": "MSTR",
@@ -87,6 +58,42 @@
       "pnl": -2.006929,
       "closed_at": "2026-11-02T19:34:11.926523+00:00",
       "reason": "stop"
+    },
+    {
+      "symbol": "AMZN",
+      "underlying": "AMZN",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.401028,
+      "entry": 249.35911,
+      "cost": 99.999985,
+      "mark": 246.33342000000002,
+      "stop": 244.37192779999998,
+      "target": 259.3334744,
+      "opened_at": "2026-11-02T14:39:14.434984+00:00",
+      "strategy": "momentum-v1",
+      "exit": 246.33342000000002,
+      "pnl": -1.213386,
+      "closed_at": "2026-11-02T20:49:10.767892+00:00",
+      "reason": "session close"
+    },
+    {
+      "symbol": "UBER",
+      "underlying": "UBER",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 1.486387,
+      "entry": 67.27720999999998,
+      "cost": 99.99997,
+      "mark": 66.5334,
+      "stop": 65.93166579999998,
+      "target": 69.96829839999998,
+      "opened_at": "2026-11-02T18:04:14.813046+00:00",
+      "strategy": "momentum-v1",
+      "exit": 66.5334,
+      "pnl": -1.105589,
+      "closed_at": "2026-11-02T20:49:10.767892+00:00",
+      "reason": "session close"
     }
   ],
   "last_entry": {
@@ -96,8 +103,8 @@
     "SOFI": "2026-11-02",
     "UBER": "2026-11-02"
   },
-  "updated_at": "2026-11-02T20:44:22.359461+00:00",
-  "equity": 488.44742,
+  "updated_at": "2026-11-02T20:49:10.767892+00:00",
+  "equity": 488.779979,
   "unsettled": [
     {
       "date": "2026-11-02",
@@ -110,6 +117,14 @@
     {
       "date": "2026-11-02",
       "amount": 97.993067
+    },
+    {
+      "date": "2026-11-02",
+      "amount": 98.786599
+    },
+    {
+      "date": "2026-11-02",
+      "amount": 98.894381
     }
   ]
 }
