@@ -1,5 +1,5 @@
 {
-  "cash": 473.39504496228,
+  "cash": 493.2173022885446,
   "closed": [
     {
       "entry": 2264.312,
@@ -94,9 +94,19 @@
       "strategy": "exploration_paper",
       "symbol": "LINK/USD",
       "time": "2026-11-02T12:38:11+00:00"
+    },
+    {
+      "entry": 8.6135,
+      "exit": 8.5626,
+      "pnl": -0.18,
+      "reason": "STOP",
+      "strategy": "exploration_paper",
+      "symbol": "AVAX/USD",
+      "time": "2026-11-02T13:13:10+00:00"
     }
   ],
   "cooldown": {
+    "AVAX/USD": "2026-11-02T13:13:10+00:00",
     "BCH/USD": "2026-11-01T22:43:09+00:00",
     "BTC/USD": "2026-11-02T03:28:26+00:00",
     "ETH/USD": "2026-11-02T04:53:10+00:00",
@@ -105,24 +115,13 @@
     "SOL/USD": "2026-11-02T06:23:12+00:00",
     "UNI/USD": "2026-11-02T09:33:12+00:00"
   },
-  "last_heartbeat": "2026-11-02T13:08:12+00:00",
+  "last_heartbeat": "2026-11-02T13:13:10+00:00",
   "last_scan": {
     "events": 1,
     "fresh_quotes": 10,
     "symbols": 10,
-    "time": "2026-11-02T13:08:12+00:00"
+    "time": "2026-11-02T13:13:10+00:00"
   },
-  "positions": {
-    "AVAX/USD": {
-      "bar": "2026-11-02T13:00:00Z",
-      "entry": 8.6135,
-      "qty": 2.3184588068266208,
-      "spent": 20.0,
-      "stop": 8.587659500000001,
-      "strategy": "exploration_paper",
-      "target": 8.6600129,
-      "time": "2026-11-02T13:08:12+00:00"
-    }
-  },
+  "positions": {},
   "version": 1
 }
