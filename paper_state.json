@@ -2,51 +2,8 @@
   "version": 1,
   "initial": 500,
   "cash": 88.78080500000003,
-  "realized": -13.439086,
-  "positions": [
-    {
-      "symbol": "NVDA",
-      "underlying": "NVDA",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 0.47916,
-      "entry": 208.69849,
-      "cost": 99.999968,
-      "mark": 207.03276,
-      "stop": 204.52452019999998,
-      "target": 217.0464296,
-      "opened_at": "2026-11-03T14:34:10.087920+00:00",
-      "strategy": "momentum-v1"
-    },
-    {
-      "symbol": "SMH",
-      "underlying": "SMH",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 0.191706,
-      "entry": 521.6311099999999,
-      "cost": 99.999814,
-      "mark": 518.92056,
-      "stop": 511.1984877999999,
-      "target": 542.4963544,
-      "opened_at": "2026-11-03T14:34:10.087920+00:00",
-      "strategy": "momentum-v1"
-    },
-    {
-      "symbol": "META",
-      "underlying": "META",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 0.161027,
-      "entry": 621.0103899999999,
-      "cost": 99.99944,
-      "mark": 618.0813,
-      "stop": 608.5901822,
-      "target": 645.8508056,
-      "opened_at": "2026-11-03T16:34:23.346606+00:00",
-      "strategy": "momentum-v1"
-    }
-  ],
+  "realized": -14.722717999999999,
+  "positions": [],
   "closed": [
     {
       "symbol": "MSTR",
@@ -155,6 +112,60 @@
       "pnl": -2.219065,
       "closed_at": "2026-11-03T16:34:23.346606+00:00",
       "reason": "stop"
+    },
+    {
+      "symbol": "NVDA",
+      "underlying": "NVDA",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.47916,
+      "entry": 208.69849,
+      "cost": 99.999968,
+      "mark": 207.07272,
+      "stop": 204.52452019999998,
+      "target": 217.0464296,
+      "opened_at": "2026-11-03T14:34:10.087920+00:00",
+      "strategy": "momentum-v1",
+      "exit": 207.07272,
+      "pnl": -0.779003,
+      "closed_at": "2026-11-03T20:49:23.149171+00:00",
+      "reason": "session close"
+    },
+    {
+      "symbol": "SMH",
+      "underlying": "SMH",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.191706,
+      "entry": 521.6311099999999,
+      "cost": 99.999814,
+      "mark": 519.62985,
+      "stop": 511.1984877999999,
+      "target": 542.4963544,
+      "opened_at": "2026-11-03T14:34:10.087920+00:00",
+      "strategy": "momentum-v1",
+      "exit": 519.62985,
+      "pnl": -0.383654,
+      "closed_at": "2026-11-03T20:49:23.149171+00:00",
+      "reason": "session close"
+    },
+    {
+      "symbol": "META",
+      "underlying": "META",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.161027,
+      "entry": 621.0103899999999,
+      "cost": 99.99944,
+      "mark": 620.2591199999999,
+      "stop": 608.5901822,
+      "target": 645.8508056,
+      "opened_at": "2026-11-03T16:34:23.346606+00:00",
+      "strategy": "momentum-v1",
+      "exit": 620.2591199999999,
+      "pnl": -0.120975,
+      "closed_at": "2026-11-03T20:49:23.149171+00:00",
+      "reason": "session close"
     }
   ],
   "last_entry": {
@@ -168,12 +179,24 @@
     "SMH": "2026-11-03",
     "META": "2026-11-03"
   },
-  "updated_at": "2026-11-03T20:44:15.916575+00:00",
-  "equity": 484.771472,
+  "updated_at": "2026-11-03T20:49:23.149171+00:00",
+  "equity": 485.277282,
   "unsettled": [
     {
       "date": "2026-11-03",
       "amount": 97.780887
+    },
+    {
+      "date": "2026-11-03",
+      "amount": 99.220965
+    },
+    {
+      "date": "2026-11-03",
+      "amount": 99.61616
+    },
+    {
+      "date": "2026-11-03",
+      "amount": 99.878465
     }
   ]
 }
