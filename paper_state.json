@@ -1,9 +1,52 @@
 {
   "version": 1,
   "initial": 500,
-  "cash": 88.78080500000003,
+  "cash": 185.27774500000004,
   "realized": -14.722717999999999,
-  "positions": [],
+  "positions": [
+    {
+      "symbol": "AAPL",
+      "underlying": "AAPL",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.28812,
+      "entry": 347.07673,
+      "cost": 99.999747,
+      "mark": 346.2534,
+      "stop": 340.1351954,
+      "target": 360.9597992,
+      "opened_at": "2026-11-04T14:34:11.914750+00:00",
+      "strategy": "momentum-v1"
+    },
+    {
+      "symbol": "AMZN",
+      "underlying": "AMZN",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.373709,
+      "entry": 267.58732,
+      "cost": 99.99979,
+      "mark": 266.91282,
+      "stop": 262.23557359999995,
+      "target": 278.29081279999997,
+      "opened_at": "2026-11-04T14:34:11.914750+00:00",
+      "strategy": "momentum-v1"
+    },
+    {
+      "symbol": "NFLX",
+      "underlying": "NFLX",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 1.543097,
+      "entry": 64.80473999999998,
+      "cost": 100.0,
+      "mark": 64.62531,
+      "stop": 63.50864519999998,
+      "target": 67.39692959999998,
+      "opened_at": "2026-11-04T14:34:11.914750+00:00",
+      "strategy": "momentum-v1"
+    }
+  ],
   "closed": [
     {
       "symbol": "MSTR",
@@ -170,33 +213,18 @@
   ],
   "last_entry": {
     "BABA": "2026-11-02",
-    "AMZN": "2026-11-02",
+    "AMZN": "2026-11-04",
     "MSTR": "2026-11-02",
     "SOFI": "2026-11-02",
     "UBER": "2026-11-02",
     "NVDA": "2026-11-03",
     "INTC": "2026-11-03",
     "SMH": "2026-11-03",
-    "META": "2026-11-03"
+    "META": "2026-11-03",
+    "AAPL": "2026-11-04",
+    "NFLX": "2026-11-04"
   },
-  "updated_at": "2026-11-04T14:29:12.678449+00:00",
-  "equity": 485.277282,
-  "unsettled": [
-    {
-      "date": "2026-11-03",
-      "amount": 97.780887
-    },
-    {
-      "date": "2026-11-03",
-      "amount": 99.220965
-    },
-    {
-      "date": "2026-11-03",
-      "amount": 99.61616
-    },
-    {
-      "date": "2026-11-03",
-      "amount": 99.878465
-    }
-  ]
+  "updated_at": "2026-11-04T14:34:11.914750+00:00",
+  "equity": 484.51112,
+  "unsettled": []
 }
