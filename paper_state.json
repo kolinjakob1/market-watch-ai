@@ -2,22 +2,8 @@
   "version": 1,
   "initial": 500,
   "cash": 185.67046900000003,
-  "realized": -14.330354999999997,
+  "realized": -25.395251999999996,
   "positions": [
-    {
-      "symbol": "BABA",
-      "underlying": "BABA",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 0.916514,
-      "entry": 109.109,
-      "cost": 99.999926,
-      "mark": 107.33256,
-      "stop": 106.92681999999999,
-      "target": 113.47336,
-      "opened_at": "2026-11-05T14:34:15.930270+00:00",
-      "strategy": "momentum-v1"
-    },
     {
       "symbol": "BAC",
       "underlying": "BAC",
@@ -26,24 +12,10 @@
       "quantity": 1.88847,
       "entry": 52.95289999999999,
       "cost": 99.999963,
-      "mark": 52.32762,
+      "mark": 52.257690000000004,
       "stop": 51.89384199999999,
       "target": 55.07101599999999,
       "opened_at": "2026-11-05T14:34:15.930270+00:00",
-      "strategy": "momentum-v1"
-    },
-    {
-      "symbol": "COST",
-      "underlying": "COST",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 0.093168,
-      "entry": 1073.32225,
-      "cost": 99.999287,
-      "mark": 1062.51642,
-      "stop": 1051.855805,
-      "target": 1116.25514,
-      "opened_at": "2026-11-05T14:39:12.096968+00:00",
       "strategy": "momentum-v1"
     }
   ],
@@ -281,6 +253,42 @@
       "pnl": 0.334853,
       "closed_at": "2026-11-04T20:49:10.052466+00:00",
       "reason": "session close"
+    },
+    {
+      "symbol": "BABA",
+      "underlying": "BABA",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.916514,
+      "entry": 109.109,
+      "cost": 99.999926,
+      "mark": 103.29660000000001,
+      "stop": 106.92681999999999,
+      "target": 113.47336,
+      "opened_at": "2026-11-05T14:34:15.930270+00:00",
+      "strategy": "momentum-v1",
+      "exit": 103.29660000000001,
+      "pnl": -5.327146,
+      "closed_at": "2026-11-05T14:49:11.888959+00:00",
+      "reason": "stop"
+    },
+    {
+      "symbol": "COST",
+      "underlying": "COST",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.093168,
+      "entry": 1073.32225,
+      "cost": 99.999287,
+      "mark": 1011.73725,
+      "stop": 1051.855805,
+      "target": 1116.25514,
+      "opened_at": "2026-11-05T14:39:12.096968+00:00",
+      "strategy": "momentum-v1",
+      "exit": 1011.73725,
+      "pnl": -5.737751,
+      "closed_at": "2026-11-05T14:49:11.888959+00:00",
+      "reason": "stop"
     }
   ],
   "last_entry": {
@@ -299,7 +307,16 @@
     "BAC": "2026-11-05",
     "COST": "2026-11-05"
   },
-  "updated_at": "2026-11-05T14:44:14.714639+00:00",
-  "equity": 481.853933,
-  "unsettled": []
+  "updated_at": "2026-11-05T14:49:11.888959+00:00",
+  "equity": 473.291865,
+  "unsettled": [
+    {
+      "date": "2026-11-05",
+      "amount": 94.67278
+    },
+    {
+      "date": "2026-11-05",
+      "amount": 94.261536
+    }
+  ]
 }
