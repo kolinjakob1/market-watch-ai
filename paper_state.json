@@ -2,23 +2,8 @@
   "version": 1,
   "initial": 500,
   "cash": 85.67047400000003,
-  "realized": -27.519364999999997,
-  "positions": [
-    {
-      "symbol": "XOM",
-      "underlying": "XOM",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 0.576857,
-      "entry": 173.35317999999998,
-      "cost": 99.999995,
-      "mark": 171.0288,
-      "stop": 169.8861164,
-      "target": 180.2873072,
-      "opened_at": "2026-11-05T16:19:11.393162+00:00",
-      "strategy": "momentum-v1"
-    }
-  ],
+  "realized": -33.159248999999996,
+  "positions": [],
   "closed": [
     {
       "symbol": "MSTR",
@@ -307,6 +292,24 @@
       "pnl": -2.124113,
       "closed_at": "2026-11-05T14:59:11.395836+00:00",
       "reason": "stop"
+    },
+    {
+      "symbol": "XOM",
+      "underlying": "XOM",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.576857,
+      "entry": 173.35317999999998,
+      "cost": 99.999995,
+      "mark": 163.57626000000002,
+      "stop": 169.8861164,
+      "target": 180.2873072,
+      "opened_at": "2026-11-05T16:19:11.393162+00:00",
+      "strategy": "momentum-v1",
+      "exit": 163.57626000000002,
+      "pnl": -5.639884,
+      "closed_at": "2026-11-05T16:39:12.979364+00:00",
+      "reason": "stop"
     }
   ],
   "last_entry": {
@@ -326,8 +329,8 @@
     "COST": "2026-11-05",
     "XOM": "2026-11-05"
   },
-  "updated_at": "2026-11-05T16:34:10.715235+00:00",
-  "equity": 471.1398,
+  "updated_at": "2026-11-05T16:39:12.979364+00:00",
+  "equity": 466.840751,
   "unsettled": [
     {
       "date": "2026-11-05",
@@ -340,6 +343,10 @@
     {
       "date": "2026-11-05",
       "amount": 97.87585
+    },
+    {
+      "date": "2026-11-05",
+      "amount": 94.360111
     }
   ]
 }
