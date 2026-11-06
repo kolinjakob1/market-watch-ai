@@ -1,5 +1,5 @@
 {
-  "cash": 433.581401297511,
+  "cash": 453.2992507167456,
   "closed": [
     {
       "entry": 2264.312,
@@ -931,6 +931,15 @@
       "strategy": "exploration_paper",
       "symbol": "AVAX/USD",
       "time": "2026-11-06T14:58:09+00:00"
+    },
+    {
+      "entry": 90.71,
+      "exit": 89.699,
+      "pnl": -0.28,
+      "reason": "STOP",
+      "strategy": "exploration_paper",
+      "symbol": "SOL/USD",
+      "time": "2026-11-06T16:13:09+00:00"
     }
   ],
   "cooldown": {
@@ -942,27 +951,16 @@
     "ETH/USD": "2026-11-06T12:53:09+00:00",
     "LINK/USD": "2026-11-06T14:03:15+00:00",
     "LTC/USD": "2026-11-06T05:03:09+00:00",
-    "SOL/USD": "2026-11-06T14:03:15+00:00",
+    "SOL/USD": "2026-11-06T16:13:09+00:00",
     "UNI/USD": "2026-11-06T08:13:13+00:00"
   },
-  "last_heartbeat": "2026-11-06T16:08:14+00:00",
+  "last_heartbeat": "2026-11-06T16:13:09+00:00",
   "last_scan": {
-    "events": 0,
+    "events": 1,
     "fresh_quotes": 10,
     "symbols": 10,
-    "time": "2026-11-06T16:08:14+00:00"
+    "time": "2026-11-06T16:13:09+00:00"
   },
-  "positions": {
-    "SOL/USD": {
-      "bar": "2026-11-06T15:10:00Z",
-      "entry": 90.71,
-      "qty": 0.22015262851506007,
-      "spent": 20.0,
-      "stop": 89.9696,
-      "strategy": "exploration_paper",
-      "target": 92.04271999999999,
-      "time": "2026-11-06T15:18:10+00:00"
-    }
-  },
+  "positions": {},
   "version": 1
 }
