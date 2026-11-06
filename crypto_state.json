@@ -1,5 +1,5 @@
 {
-  "cash": 320.6232073599602,
+  "cash": 340.86341149497684,
   "closed": [
     {
       "entry": 2264.312,
@@ -751,6 +751,15 @@
       "strategy": "exploration_paper",
       "symbol": "AAVE/USD",
       "time": "2026-11-05T22:23:11+00:00"
+    },
+    {
+      "entry": 6.89,
+      "exit": 6.9937,
+      "pnl": 0.24,
+      "reason": "TARGET",
+      "strategy": "exploration_paper",
+      "symbol": "UNI/USD",
+      "time": "2026-11-06T00:43:11+00:00"
     }
   ],
   "cooldown": {
@@ -763,14 +772,14 @@
     "LINK/USD": "2026-11-05T07:58:13+00:00",
     "LTC/USD": "2026-11-05T09:38:11+00:00",
     "SOL/USD": "2026-11-05T10:48:09+00:00",
-    "UNI/USD": "2026-11-04T05:48:10+00:00"
+    "UNI/USD": "2026-11-06T00:43:11+00:00"
   },
-  "last_heartbeat": "2026-11-06T00:38:10+00:00",
+  "last_heartbeat": "2026-11-06T00:43:11+00:00",
   "last_scan": {
-    "events": 0,
+    "events": 1,
     "fresh_quotes": 10,
     "symbols": 10,
-    "time": "2026-11-06T00:38:10+00:00"
+    "time": "2026-11-06T00:43:11+00:00"
   },
   "positions": {
     "BTC/USD": {
@@ -782,16 +791,6 @@
       "strategy": "trend",
       "target": 76665.85278928571,
       "time": "2026-11-06T00:33:11+00:00"
-    },
-    "UNI/USD": {
-      "bar": "2026-11-06T00:15:00Z",
-      "entry": 6.89,
-      "qty": 2.8984100047316543,
-      "spent": 20.0,
-      "stop": 6.836237857142857,
-      "strategy": "exploration_paper",
-      "target": 6.986771857142856,
-      "time": "2026-11-06T00:23:12+00:00"
     }
   },
   "version": 1
