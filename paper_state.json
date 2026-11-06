@@ -2,37 +2,8 @@
   "version": 1,
   "initial": 500,
   "cash": 2.0000000063191692e-05,
-  "realized": -39.689105999999995,
-  "positions": [
-    {
-      "symbol": "TSLA",
-      "underlying": "TSLA",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 0.278265,
-      "entry": 359.36900999999995,
-      "cost": 99.999818,
-      "mark": 357.642,
-      "stop": 352.18162979999994,
-      "target": 373.74377039999996,
-      "opened_at": "2026-11-06T15:34:12.308475+00:00",
-      "strategy": "momentum-v1"
-    },
-    {
-      "symbol": "INTC",
-      "underlying": "INTC",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 1.212986,
-      "entry": 55.10504999999999,
-      "cost": 66.841654,
-      "mark": 56.203739999999996,
-      "stop": 54.002948999999994,
-      "target": 57.309251999999994,
-      "opened_at": "2026-11-06T15:39:11.904903+00:00",
-      "strategy": "momentum-v1"
-    }
-  ],
+  "realized": -38.17707399999999,
+  "positions": [],
   "closed": [
     {
       "symbol": "MSTR",
@@ -393,6 +364,42 @@
       "pnl": -2.256398,
       "closed_at": "2026-11-06T17:54:11.884844+00:00",
       "reason": "stop"
+    },
+    {
+      "symbol": "TSLA",
+      "underlying": "TSLA",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.278265,
+      "entry": 359.36900999999995,
+      "cost": 99.999818,
+      "mark": 359.36028000000005,
+      "stop": 352.18162979999994,
+      "target": 373.74377039999996,
+      "opened_at": "2026-11-06T15:34:12.308475+00:00",
+      "strategy": "momentum-v1",
+      "exit": 359.36028000000005,
+      "pnl": -0.00243,
+      "closed_at": "2026-11-06T20:49:11.069878+00:00",
+      "reason": "session close"
+    },
+    {
+      "symbol": "INTC",
+      "underlying": "INTC",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 1.212986,
+      "entry": 55.10504999999999,
+      "cost": 66.841654,
+      "mark": 56.35359,
+      "stop": 54.002948999999994,
+      "target": 57.309251999999994,
+      "opened_at": "2026-11-06T15:39:11.904903+00:00",
+      "strategy": "momentum-v1",
+      "exit": 56.35359,
+      "pnl": 1.514462,
+      "closed_at": "2026-11-06T20:49:11.069878+00:00",
+      "reason": "session close"
     }
   ],
   "last_entry": {
@@ -414,8 +421,8 @@
     "GOOGL": "2026-11-06",
     "TSLA": "2026-11-06"
   },
-  "updated_at": "2026-11-06T20:44:09.975073+00:00",
-  "equity": 461.163023,
+  "updated_at": "2026-11-06T20:49:11.069878+00:00",
+  "equity": 461.822926,
   "unsettled": [
     {
       "date": "2026-11-06",
@@ -428,6 +435,14 @@
     {
       "date": "2026-11-06",
       "amount": 97.743441
+    },
+    {
+      "date": "2026-11-06",
+      "amount": 99.997388
+    },
+    {
+      "date": "2026-11-06",
+      "amount": 68.356116
     }
   ]
 }
