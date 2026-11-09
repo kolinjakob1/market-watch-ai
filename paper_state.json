@@ -2,51 +2,8 @@
   "version": 1,
   "initial": 500,
   "cash": 0.0003040000000709142,
-  "realized": -43.04246099999999,
-  "positions": [
-    {
-      "symbol": "META",
-      "underlying": "META",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 0.156438,
-      "entry": 639.2285899999999,
-      "cost": 99.999642,
-      "mark": 645.01434,
-      "stop": 626.4440182,
-      "target": 664.7977336,
-      "opened_at": "2026-11-09T14:34:16.389284+00:00",
-      "strategy": "momentum-v1"
-    },
-    {
-      "symbol": "QQQ",
-      "underlying": "QQQ",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 0.148548,
-      "entry": 673.1825099999999,
-      "cost": 99.999915,
-      "mark": 679.68963,
-      "stop": 659.7188597999999,
-      "target": 700.1098103999999,
-      "opened_at": "2026-11-09T15:04:14.027647+00:00",
-      "strategy": "momentum-v1"
-    },
-    {
-      "symbol": "AAPL",
-      "underlying": "AAPL",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 0.176074,
-      "entry": 351.12076999999994,
-      "cost": 61.823238,
-      "mark": 350.24940000000004,
-      "stop": 344.09835459999994,
-      "target": 365.16560079999994,
-      "opened_at": "2026-11-09T15:29:09.054479+00:00",
-      "strategy": "momentum-v1"
-    }
-  ],
+  "realized": -41.14391299999998,
+  "positions": [],
   "closed": [
     {
       "symbol": "MSTR",
@@ -479,6 +436,60 @@
       "pnl": -2.033864,
       "closed_at": "2026-11-09T15:29:09.054479+00:00",
       "reason": "stop"
+    },
+    {
+      "symbol": "META",
+      "underlying": "META",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.156438,
+      "entry": 639.2285899999999,
+      "cost": 99.999642,
+      "mark": 645.06429,
+      "stop": 626.4440182,
+      "target": 664.7977336,
+      "opened_at": "2026-11-09T14:34:16.389284+00:00",
+      "strategy": "momentum-v1",
+      "exit": 645.06429,
+      "pnl": 0.912925,
+      "closed_at": "2026-11-09T20:49:12.214587+00:00",
+      "reason": "session close"
+    },
+    {
+      "symbol": "QQQ",
+      "underlying": "QQQ",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.148548,
+      "entry": 673.1825099999999,
+      "cost": 99.999915,
+      "mark": 680.19912,
+      "stop": 659.7188597999999,
+      "target": 700.1098103999999,
+      "opened_at": "2026-11-09T15:04:14.027647+00:00",
+      "strategy": "momentum-v1",
+      "exit": 680.19912,
+      "pnl": 1.042304,
+      "closed_at": "2026-11-09T20:49:12.214587+00:00",
+      "reason": "session close"
+    },
+    {
+      "symbol": "AAPL",
+      "underlying": "AAPL",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.176074,
+      "entry": 351.12076999999994,
+      "cost": 61.823238,
+      "mark": 350.79884999999996,
+      "stop": 344.09835459999994,
+      "target": 365.16560079999994,
+      "opened_at": "2026-11-09T15:29:09.054479+00:00",
+      "strategy": "momentum-v1",
+      "exit": 350.79884999999996,
+      "pnl": -0.056681,
+      "closed_at": "2026-11-09T20:49:12.214587+00:00",
+      "reason": "session close"
     }
   ],
   "last_entry": {
@@ -501,8 +512,8 @@
     "TSLA": "2026-11-06",
     "QQQ": "2026-11-09"
   },
-  "updated_at": "2026-11-09T20:44:11.258433+00:00",
-  "equity": 458.675845,
+  "updated_at": "2026-11-09T20:49:12.214587+00:00",
+  "equity": 458.856087,
   "unsettled": [
     {
       "date": "2026-11-09",
@@ -511,6 +522,18 @@
     {
       "date": "2026-11-09",
       "amount": 97.965986
+    },
+    {
+      "date": "2026-11-09",
+      "amount": 100.912567
+    },
+    {
+      "date": "2026-11-09",
+      "amount": 101.042219
+    },
+    {
+      "date": "2026-11-09",
+      "amount": 61.766557
     }
   ]
 }
