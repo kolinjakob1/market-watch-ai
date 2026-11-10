@@ -2,23 +2,8 @@
   "version": 1,
   "initial": 500,
   "cash": 158.857192,
-  "realized": -46.096786999999985,
-  "positions": [
-    {
-      "symbol": "AMZN",
-      "underlying": "AMZN",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 0.366753,
-      "entry": 272.66238999999996,
-      "cost": 99.99975,
-      "mark": 270.43928999999997,
-      "stop": 267.2091422,
-      "target": 283.5688856,
-      "opened_at": "2026-11-10T15:04:10.716841+00:00",
-      "strategy": "momentum-v1"
-    }
-  ],
+  "realized": -46.516418999999985,
+  "positions": [],
   "closed": [
     {
       "symbol": "MSTR",
@@ -541,6 +526,24 @@
       "pnl": -2.75846,
       "closed_at": "2026-11-10T16:59:11.877279+00:00",
       "reason": "stop"
+    },
+    {
+      "symbol": "AMZN",
+      "underlying": "AMZN",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.366753,
+      "entry": 272.66238999999996,
+      "cost": 99.99975,
+      "mark": 271.51821,
+      "stop": 267.2091422,
+      "target": 283.5688856,
+      "opened_at": "2026-11-10T15:04:10.716841+00:00",
+      "strategy": "momentum-v1",
+      "exit": 271.51821,
+      "pnl": -0.419632,
+      "closed_at": "2026-11-10T20:49:12.196973+00:00",
+      "reason": "session close"
     }
   ],
   "last_entry": {
@@ -565,8 +568,8 @@
     "AVGO": "2026-11-10",
     "AMD": "2026-11-10"
   },
-  "updated_at": "2026-11-10T20:44:13.932544+00:00",
-  "equity": 453.087884,
+  "updated_at": "2026-11-10T20:49:12.196973+00:00",
+  "equity": 453.483581,
   "unsettled": [
     {
       "date": "2026-11-10",
@@ -575,6 +578,10 @@
     {
       "date": "2026-11-10",
       "amount": 97.241221
+    },
+    {
+      "date": "2026-11-10",
+      "amount": 99.580118
     }
   ]
 }
