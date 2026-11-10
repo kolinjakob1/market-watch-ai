@@ -1,9 +1,24 @@
 {
   "version": 1,
   "initial": 500,
-  "cash": 458.856087,
+  "cash": 358.856406,
   "realized": -41.14391299999998,
-  "positions": [],
+  "positions": [
+    {
+      "symbol": "AVGO",
+      "underlying": "AVGO",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.304183,
+      "entry": 328.74841999999995,
+      "cost": 99.999681,
+      "mark": 327.672,
+      "stop": 322.17345159999996,
+      "target": 341.8983568,
+      "opened_at": "2026-11-10T14:54:13.035565+00:00",
+      "strategy": "momentum-v1"
+    }
+  ],
   "closed": [
     {
       "symbol": "MSTR",
@@ -510,9 +525,10 @@
     "XOM": "2026-11-05",
     "GOOGL": "2026-11-06",
     "TSLA": "2026-11-06",
-    "QQQ": "2026-11-09"
+    "QQQ": "2026-11-09",
+    "AVGO": "2026-11-10"
   },
-  "updated_at": "2026-11-10T14:49:14.514402+00:00",
-  "equity": 458.856087,
+  "updated_at": "2026-11-10T14:54:13.035565+00:00",
+  "equity": 458.528658,
   "unsettled": []
 }
