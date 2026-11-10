@@ -2,7 +2,7 @@
   "version": 1,
   "initial": 500,
   "cash": 158.857192,
-  "realized": -41.14391299999998,
+  "realized": -43.338326999999985,
   "positions": [
     {
       "symbol": "AVGO",
@@ -26,23 +26,9 @@
       "quantity": 0.366753,
       "entry": 272.66238999999996,
       "cost": 99.99975,
-      "mark": 271.5282,
+      "mark": 270.65907,
       "stop": 267.2091422,
       "target": 283.5688856,
-      "opened_at": "2026-11-10T15:04:10.716841+00:00",
-      "strategy": "momentum-v1"
-    },
-    {
-      "symbol": "AMD",
-      "underlying": "AMD",
-      "multiplier": 1,
-      "feed": "iex",
-      "quantity": 0.186425,
-      "entry": 536.4058699999999,
-      "cost": 99.999464,
-      "mark": 526.59288,
-      "stop": 525.6777526,
-      "target": 557.8621048,
       "opened_at": "2026-11-10T15:04:10.716841+00:00",
       "strategy": "momentum-v1"
     }
@@ -533,6 +519,24 @@
       "pnl": -0.056681,
       "closed_at": "2026-11-09T20:49:12.214587+00:00",
       "reason": "session close"
+    },
+    {
+      "symbol": "AMD",
+      "underlying": "AMD",
+      "multiplier": 1,
+      "feed": "iex",
+      "quantity": 0.186425,
+      "entry": 536.4058699999999,
+      "cost": 99.999464,
+      "mark": 524.6348399999999,
+      "stop": 525.6777526,
+      "target": 557.8621048,
+      "opened_at": "2026-11-10T15:04:10.716841+00:00",
+      "strategy": "momentum-v1",
+      "exit": 524.6348399999999,
+      "pnl": -2.194414,
+      "closed_at": "2026-11-10T15:44:12.512836+00:00",
+      "reason": "stop"
     }
   ],
   "last_entry": {
@@ -557,7 +561,12 @@
     "AVGO": "2026-11-10",
     "AMD": "2026-11-10"
   },
-  "updated_at": "2026-11-10T15:39:16.701620+00:00",
-  "equity": 455.326085,
-  "unsettled": []
+  "updated_at": "2026-11-10T15:44:12.512836+00:00",
+  "equity": 454.642302,
+  "unsettled": [
+    {
+      "date": "2026-11-10",
+      "amount": 97.80505
+    }
+  ]
 }
