@@ -1,5 +1,5 @@
 {
-  "cash": 400.016615814022,
+  "cash": 419.7750445758827,
   "closed": [
     {
       "entry": 2264.312,
@@ -1390,10 +1390,19 @@
       "strategy": "exploration_paper",
       "symbol": "LTC/USD",
       "time": "2026-11-10T10:48:11+00:00"
+    },
+    {
+      "entry": 125.352,
+      "exit": 124.21,
+      "pnl": -0.24,
+      "reason": "STOP",
+      "strategy": "exploration_paper",
+      "symbol": "AAVE/USD",
+      "time": "2026-11-10T14:18:09+00:00"
     }
   ],
   "cooldown": {
-    "AAVE/USD": "2026-11-09T20:33:11+00:00",
+    "AAVE/USD": "2026-11-10T14:18:09+00:00",
     "AVAX/USD": "2026-11-10T02:23:11+00:00",
     "BCH/USD": "2026-11-10T05:23:09+00:00",
     "BTC/USD": "2026-11-09T23:53:11+00:00",
@@ -1404,24 +1413,13 @@
     "SOL/USD": "2026-11-09T15:43:10+00:00",
     "UNI/USD": "2026-11-09T22:18:11+00:00"
   },
-  "last_heartbeat": "2026-11-10T14:13:12+00:00",
+  "last_heartbeat": "2026-11-10T14:18:09+00:00",
   "last_scan": {
-    "events": 0,
+    "events": 1,
     "fresh_quotes": 10,
     "symbols": 10,
-    "time": "2026-11-10T14:13:12+00:00"
+    "time": "2026-11-10T14:18:09+00:00"
   },
-  "positions": {
-    "AAVE/USD": {
-      "bar": "2026-11-10T13:45:00Z",
-      "entry": 125.352,
-      "qty": 0.15931173760770548,
-      "spent": 20.0,
-      "stop": 124.43126785714286,
-      "strategy": "exploration_paper",
-      "target": 127.00931785714286,
-      "time": "2026-11-10T13:53:21+00:00"
-    }
-  },
+  "positions": {},
   "version": 1
 }
