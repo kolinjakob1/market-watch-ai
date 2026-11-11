@@ -1,5 +1,5 @@
 {
-  "cash": 373.15242081000775,
+  "cash": 392.9833527988491,
   "closed": [
     {
       "entry": 2264.312,
@@ -1741,6 +1741,15 @@
       "strategy": "exploration_paper",
       "symbol": "BCH/USD",
       "time": "2026-11-11T14:34:06+00:00"
+    },
+    {
+      "entry": 84.157,
+      "exit": 83.6963,
+      "pnl": -0.17,
+      "reason": "STOP",
+      "strategy": "exploration_paper",
+      "symbol": "SOL/USD",
+      "time": "2026-11-11T15:08:44+00:00"
     }
   ],
   "cooldown": {
@@ -1752,27 +1761,16 @@
     "ETH/USD": "2026-11-11T08:28:09+00:00",
     "LINK/USD": "2026-11-11T04:23:10+00:00",
     "LTC/USD": "2026-11-11T13:38:09+00:00",
-    "SOL/USD": "2026-11-11T13:18:11+00:00",
+    "SOL/USD": "2026-11-11T15:08:44+00:00",
     "UNI/USD": "2026-11-11T14:14:06+00:00"
   },
-  "last_heartbeat": "2026-11-11T15:07:40+00:00",
+  "last_heartbeat": "2026-11-11T15:08:44+00:00",
   "last_scan": {
-    "events": 0,
+    "events": 1,
     "fresh_quotes": 10,
     "symbols": 10,
-    "time": "2026-11-11T15:07:40+00:00"
+    "time": "2026-11-11T15:08:44+00:00"
   },
-  "positions": {
-    "SOL/USD": {
-      "bar": "2026-11-11T14:35:00Z",
-      "entry": 84.157,
-      "qty": 0.2372951142816533,
-      "spent": 20.0,
-      "stop": 83.74518571428571,
-      "strategy": "exploration_paper",
-      "target": 84.89826571428571,
-      "time": "2026-11-11T14:43:10+00:00"
-    }
-  },
+  "positions": {},
   "version": 1
 }
