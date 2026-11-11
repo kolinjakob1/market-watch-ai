@@ -7,8 +7,9 @@ from datetime import datetime, timezone
 def main():
     from paper_engine import run
     from scanner import send_telegram, telegram_token, required_env
-    message = run(datetime.now(timezone.utc))
-    if os.environ.get('DRY_RUN') == '1':
+    dry_run = os.environ.get('DRY_RUN') == '1'
+    message = run(datetime.now(timezone.utc), persist=not dry_run)
+    if dry_run:
         print(message)
     else:
         send_telegram(telegram_token(required_env('TELEGRAM_BOT_TOKEN')),

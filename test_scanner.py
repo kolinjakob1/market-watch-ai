@@ -66,7 +66,10 @@ class PaperTests(unittest.TestCase):
         paper.tick(s,{'AAPL':snap(11,11.01)},[e],NOW)
         self.assertEqual(len(s['closed']),1);self.assertEqual(len(s['positions']),0)
         self.assertGreater(s['realized'],0);self.assertLess(s['cash'],401)
-        paper.tick(s,{},[],NOW+timedelta(days=1));self.assertGreater(s['cash'],500)
+        paper.tick(s, {}, [], NOW + timedelta(days=1))
+        self.assertLess(s['cash'], 401)
+        paper.tick(s, {}, [], NOW + timedelta(days=2), settled_dates={'2026-11-02'})
+        self.assertGreater(s['cash'], 500)
     def test_stale_crossed_nonfinite_and_zero_size_rejected(self):
         for q in [snap(age=3600),snap(11,10),snap(float('nan'),10)]:
             s=self.state();paper.tick(s,{'AAPL':q},[self.entry()],NOW);self.assertEqual(s['positions'],[])
@@ -75,11 +78,12 @@ class PaperTests(unittest.TestCase):
     def test_option_contract_multiplier_and_affordability(self):
         e={'symbol':'AAPL261120C00200000','underlying':'AAPL','multiplier':100,'feed':'opra'}
         s=self.state()
-        paper.tick(s,{e['symbol']:snap(.8,.81)},[e],NOW)
+        paper.tick(s,{e['symbol']:snap(.47,.48)},[e],NOW)
         self.assertEqual(s['positions'][0]['quantity'],1)
-        self.assertLess(s['positions'][0]['cost'],100)
+        self.assertLess(s['positions'][0]['cost'], 50)
+        self.assertLess(s['positions'][0]['planned_risk'], 10)
         s=self.state()
-        paper.tick(s,{e['symbol']:snap(1.1,1.11)},[e],NOW)
+        paper.tick(s,{e['symbol']:snap(.50,.51)},[e],NOW)
         self.assertEqual(s['positions'],[])
 
     def test_stop_and_close(self):
