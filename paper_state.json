@@ -2,7 +2,7 @@
   "version": 1,
   "initial": 500,
   "cash": 243.90819499999998,
-  "realized": -56.09202499999998,
+  "realized": -60.581626999999976,
   "positions": [
     {
       "symbol": "DIS",
@@ -13,27 +13,11 @@
       "quantity": 0.837455,
       "entry": 119.40929,
       "cost": 99.999907,
-      "mark": 117.89199,
+      "mark": 119.12075999999999,
       "stop": 117.0211042,
       "target": 124.1856616,
       "planned_risk": 1.9999981391390018,
       "opened_at": "2026-11-13T17:14:13.300387+00:00",
-      "strategy": "intraday-momentum-v2"
-    },
-    {
-      "symbol": "WMT",
-      "underlying": "WMT",
-      "multiplier": 1,
-      "feed": "iex",
-      "signal_bar": "2026-11-13T12:15:00-05:00",
-      "quantity": 0.777916,
-      "entry": 128.54841999999996,
-      "cost": 99.999873,
-      "mark": 127.88198999999999,
-      "stop": 125.97745159999997,
-      "target": 133.69035679999996,
-      "planned_risk": 1.9999974538543988,
-      "opened_at": "2026-11-13T17:24:13.582667+00:00",
       "strategy": "intraday-momentum-v2"
     }
   ],
@@ -727,6 +711,26 @@
       "pnl": -0.98721,
       "closed_at": "2026-11-12T20:49:11.615527+00:00",
       "reason": "session close"
+    },
+    {
+      "symbol": "WMT",
+      "underlying": "WMT",
+      "multiplier": 1,
+      "feed": "iex",
+      "signal_bar": "2026-11-13T12:15:00-05:00",
+      "quantity": 0.777916,
+      "entry": 128.54841999999996,
+      "cost": 99.999873,
+      "mark": 122.7771,
+      "stop": 125.97745159999997,
+      "target": 133.69035679999996,
+      "planned_risk": 1.9999974538543988,
+      "opened_at": "2026-11-13T17:24:13.582667+00:00",
+      "strategy": "intraday-momentum-v2",
+      "exit": 122.7771,
+      "pnl": -4.489602,
+      "closed_at": "2026-11-13T18:04:11.998760+00:00",
+      "reason": "stop"
     }
   ],
   "last_entry": {
@@ -755,7 +759,12 @@
     "DIS": "2026-11-13",
     "WMT": "2026-11-13"
   },
-  "updated_at": "2026-11-13T17:59:11.177199+00:00",
-  "equity": 442.118878,
-  "unsettled": []
+  "updated_at": "2026-11-13T18:04:11.497076+00:00",
+  "equity": 439.176742,
+  "unsettled": [
+    {
+      "date": "2026-11-13",
+      "amount": 95.510271
+    }
+  ]
 }
