@@ -1,5 +1,5 @@
 {
-  "cash": 317.91689405191414,
+  "cash": 337.7604310899558,
   "closed": [
     {
       "entry": 2264.312,
@@ -2542,6 +2542,15 @@
       "strategy": "trend",
       "symbol": "ETH/USD",
       "time": "2026-11-16T23:03:09+00:00"
+    },
+    {
+      "entry": 5.163,
+      "exit": 5.138,
+      "pnl": -0.16,
+      "reason": "STOP",
+      "strategy": "exploration_paper",
+      "symbol": "UNI/USD",
+      "time": "2026-11-16T23:28:09+00:00"
     }
   ],
   "cooldown": {
@@ -2554,26 +2563,15 @@
     "LINK/USD": "2026-11-16T19:48:10+00:00",
     "LTC/USD": "2026-11-15T08:18:19+00:00",
     "SOL/USD": "2026-11-16T22:53:09+00:00",
-    "UNI/USD": "2026-11-16T22:03:25+00:00"
+    "UNI/USD": "2026-11-16T23:28:09+00:00"
   },
-  "last_heartbeat": "2026-11-16T23:23:13+00:00",
+  "last_heartbeat": "2026-11-16T23:28:09+00:00",
   "last_scan": {
-    "events": 0,
+    "events": 1,
     "fresh_quotes": 10,
     "symbols": 10,
-    "time": "2026-11-16T23:23:13+00:00"
+    "time": "2026-11-16T23:28:09+00:00"
   },
-  "positions": {
-    "UNI/USD": {
-      "bar": "2026-11-16T23:05:00Z",
-      "entry": 5.163,
-      "qty": 3.8679149588613395,
-      "spent": 20.0,
-      "stop": 5.141869285714286,
-      "strategy": "exploration_paper",
-      "target": 5.201035285714285,
-      "time": "2026-11-16T23:13:09+00:00"
-    }
-  },
+  "positions": {},
   "version": 1
 }
