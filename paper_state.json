@@ -2,25 +2,8 @@
   "version": 1,
   "initial": 500,
   "cash": 338.676828,
-  "realized": -61.323409999999974,
-  "positions": [
-    {
-      "symbol": "QQQ",
-      "underlying": "QQQ",
-      "multiplier": 1,
-      "feed": "iex",
-      "signal_bar": "2026-11-16T11:25:00-05:00",
-      "quantity": 0.149229,
-      "entry": 670.10944,
-      "cost": 99.999762,
-      "mark": 660.2590799999999,
-      "stop": 656.7072512,
-      "target": 696.9138176,
-      "planned_risk": 1.9999952324351964,
-      "opened_at": "2026-11-16T16:34:13.682096+00:00",
-      "strategy": "intraday-momentum-v2"
-    }
-  ],
+  "realized": -62.71435699999997,
+  "positions": [],
   "closed": [
     {
       "symbol": "MSTR",
@@ -771,6 +754,26 @@
       "pnl": -0.106942,
       "closed_at": "2026-11-13T20:49:11.270837+00:00",
       "reason": "session close"
+    },
+    {
+      "symbol": "QQQ",
+      "underlying": "QQQ",
+      "multiplier": 1,
+      "feed": "iex",
+      "signal_bar": "2026-11-16T11:25:00-05:00",
+      "quantity": 0.149229,
+      "entry": 670.10944,
+      "cost": 99.999762,
+      "mark": 660.7885500000001,
+      "stop": 656.7072512,
+      "target": 696.9138176,
+      "planned_risk": 1.9999952324351964,
+      "opened_at": "2026-11-16T16:34:13.682096+00:00",
+      "strategy": "intraday-momentum-v2",
+      "exit": 660.7885500000001,
+      "pnl": -1.390947,
+      "closed_at": "2026-11-16T20:49:10.128527+00:00",
+      "reason": "session close"
     }
   ],
   "last_entry": {
@@ -799,7 +802,12 @@
     "DIS": "2026-11-13",
     "WMT": "2026-11-13"
   },
-  "updated_at": "2026-11-16T20:44:10.372135+00:00",
-  "equity": 437.20663,
-  "unsettled": []
+  "updated_at": "2026-11-16T20:49:10.045523+00:00",
+  "equity": 437.285643,
+  "unsettled": [
+    {
+      "date": "2026-11-16",
+      "amount": 98.608815
+    }
+  ]
 }
