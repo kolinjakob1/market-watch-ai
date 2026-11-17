@@ -1,9 +1,26 @@
 {
   "version": 1,
   "initial": 500,
-  "cash": 437.285643,
+  "cash": 337.285885,
   "realized": -62.71435699999997,
-  "positions": [],
+  "positions": [
+    {
+      "symbol": "AMZN",
+      "underlying": "AMZN",
+      "multiplier": 1,
+      "feed": "iex",
+      "signal_bar": "2026-11-17T12:50:00-05:00",
+      "quantity": 0.388232,
+      "entry": 257.57732,
+      "cost": 99.999758,
+      "mark": 256.9428,
+      "stop": 252.42577359999999,
+      "target": 267.8804128,
+      "planned_risk": 1.9999951619648004,
+      "opened_at": "2026-11-17T17:59:12.756430+00:00",
+      "strategy": "intraday-momentum-v2"
+    }
+  ],
   "closed": [
     {
       "symbol": "MSTR",
@@ -778,7 +795,7 @@
   ],
   "last_entry": {
     "BABA": "2026-11-05",
-    "AMZN": "2026-11-10",
+    "AMZN": "2026-11-17",
     "MSTR": "2026-11-02",
     "SOFI": "2026-11-12",
     "UBER": "2026-11-02",
@@ -802,7 +819,7 @@
     "DIS": "2026-11-13",
     "WMT": "2026-11-13"
   },
-  "updated_at": "2026-11-17T17:54:15.875060+00:00",
-  "equity": 437.285643,
+  "updated_at": "2026-11-17T17:59:11.593114+00:00",
+  "equity": 437.039302,
   "unsettled": []
 }
