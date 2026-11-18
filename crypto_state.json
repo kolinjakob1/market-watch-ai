@@ -1,15 +1,6 @@
 {
-  "cash": 182.3675506083971,
+  "cash": 202.2197738913287,
   "closed": [
-    {
-      "entry": 78006.726,
-      "exit": 78533.9,
-      "pnl": 0.47,
-      "reason": "TARGET",
-      "strategy": "legacy_unknown",
-      "symbol": "BTC/USD",
-      "time": "2026-11-02T03:28:26+00:00"
-    },
     {
       "entry": 2306.755,
       "exit": 2289.52,
@@ -2700,6 +2691,15 @@
       "strategy": "trend",
       "symbol": "SOL/USD",
       "time": "2026-11-18T04:08:18+00:00"
+    },
+    {
+      "entry": 75.1612,
+      "exit": 74.83,
+      "pnl": -0.15,
+      "reason": "STOP",
+      "strategy": "exploration_paper",
+      "symbol": "SOL/USD",
+      "time": "2026-11-18T06:33:09+00:00"
     }
   ],
   "cooldown": {
@@ -2711,15 +2711,15 @@
     "ETH/USD": "2026-11-18T01:03:08+00:00",
     "LINK/USD": "2026-11-17T23:03:08+00:00",
     "LTC/USD": "2026-11-17T23:43:12+00:00",
-    "SOL/USD": "2026-11-18T04:08:18+00:00",
+    "SOL/USD": "2026-11-18T06:33:09+00:00",
     "UNI/USD": "2026-11-17T07:03:13+00:00"
   },
-  "last_heartbeat": "2026-11-18T06:28:10+00:00",
+  "last_heartbeat": "2026-11-18T06:33:09+00:00",
   "last_scan": {
-    "events": 0,
+    "events": 1,
     "fresh_quotes": 10,
     "symbols": 10,
-    "time": "2026-11-18T06:28:10+00:00"
+    "time": "2026-11-18T06:33:09+00:00"
   },
   "positions": {
     "BTC/USD": {
@@ -2731,16 +2731,6 @@
       "strategy": "breakout",
       "target": 65063.7159326,
       "time": "2026-11-18T05:28:11+00:00"
-    },
-    "SOL/USD": {
-      "bar": "2026-11-18T05:10:00Z",
-      "entry": 75.1612,
-      "qty": 0.2656961960772459,
-      "spent": 19.999999999999996,
-      "stop": 74.86083035714285,
-      "strategy": "exploration_paper",
-      "target": 75.70186535714285,
-      "time": "2026-11-18T05:18:12+00:00"
     }
   },
   "version": 1
