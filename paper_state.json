@@ -2,41 +2,8 @@
   "version": 1,
   "initial": 500,
   "cash": 136.66215500000004,
-  "realized": -66.36005199999997,
-  "positions": [
-    {
-      "symbol": "IWM",
-      "underlying": "IWM",
-      "multiplier": 1,
-      "feed": "iex",
-      "signal_bar": "2026-11-18T12:00:00-05:00",
-      "quantity": 0.369002,
-      "entry": 271.00073,
-      "cost": 99.999811,
-      "mark": 269.98974,
-      "stop": 265.5807154,
-      "target": 281.8407592,
-      "planned_risk": 1.9999962274292007,
-      "opened_at": "2026-11-18T17:09:13.039186+00:00",
-      "strategy": "intraday-momentum-v2"
-    },
-    {
-      "symbol": "MSFT",
-      "underlying": "MSFT",
-      "multiplier": 1,
-      "feed": "iex",
-      "signal_bar": "2026-11-18T13:50:00-05:00",
-      "quantity": 0.195732,
-      "entry": 510.9003899999999,
-      "cost": 99.999555,
-      "mark": 506.57292,
-      "stop": 500.6823821999999,
-      "target": 531.3364055999999,
-      "planned_risk": 1.9999911027096018,
-      "opened_at": "2026-11-18T18:59:18.997490+00:00",
-      "strategy": "intraday-momentum-v2"
-    }
-  ],
+  "realized": -68.36282299999998,
+  "positions": [],
   "closed": [
     {
       "symbol": "MSTR",
@@ -867,6 +834,46 @@
       "pnl": -3.021509,
       "closed_at": "2026-11-18T18:59:18.922223+00:00",
       "reason": "stop"
+    },
+    {
+      "symbol": "IWM",
+      "underlying": "IWM",
+      "multiplier": 1,
+      "feed": "iex",
+      "signal_bar": "2026-11-18T12:00:00-05:00",
+      "quantity": 0.369002,
+      "entry": 271.00073,
+      "cost": 99.999811,
+      "mark": 269.83989,
+      "stop": 265.5807154,
+      "target": 281.8407592,
+      "planned_risk": 1.9999962274292007,
+      "opened_at": "2026-11-18T17:09:13.039186+00:00",
+      "strategy": "intraday-momentum-v2",
+      "exit": 269.83989,
+      "pnl": -0.428352,
+      "closed_at": "2026-11-18T20:49:09.582172+00:00",
+      "reason": "session close"
+    },
+    {
+      "symbol": "MSFT",
+      "underlying": "MSFT",
+      "multiplier": 1,
+      "feed": "iex",
+      "signal_bar": "2026-11-18T13:50:00-05:00",
+      "quantity": 0.195732,
+      "entry": 510.9003899999999,
+      "cost": 99.999555,
+      "mark": 502.85664,
+      "stop": 500.6823821999999,
+      "target": 531.3364055999999,
+      "planned_risk": 1.9999911027096018,
+      "opened_at": "2026-11-18T18:59:18.997490+00:00",
+      "strategy": "intraday-momentum-v2",
+      "exit": 502.85664,
+      "pnl": -1.574419,
+      "closed_at": "2026-11-18T20:49:09.582172+00:00",
+      "reason": "session close"
     }
   ],
   "last_entry": {
@@ -896,12 +903,20 @@
     "WMT": "2026-11-13",
     "IWM": "2026-11-18"
   },
-  "updated_at": "2026-11-18T20:44:10.435929+00:00",
-  "equity": 432.419867,
+  "updated_at": "2026-11-18T20:49:09.317874+00:00",
+  "equity": 431.637177,
   "unsettled": [
     {
       "date": "2026-11-18",
       "amount": 96.978427
+    },
+    {
+      "date": "2026-11-18",
+      "amount": 99.571459
+    },
+    {
+      "date": "2026-11-18",
+      "amount": 98.425136
     }
   ]
 }
