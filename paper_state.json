@@ -2,25 +2,8 @@
   "version": 1,
   "initial": 500,
   "cash": 331.637341,
-  "realized": -68.36282299999998,
-  "positions": [
-    {
-      "symbol": "AAPL",
-      "underlying": "AAPL",
-      "multiplier": 1,
-      "feed": "iex",
-      "signal_bar": "2026-11-19T12:30:00-05:00",
-      "quantity": 0.284745,
-      "entry": 351.1908399999999,
-      "cost": 99.999836,
-      "mark": 348.52113,
-      "stop": 344.1670231999999,
-      "target": 365.2384735999999,
-      "planned_risk": 1.9999967147160058,
-      "opened_at": "2026-11-19T17:39:11.576216+00:00",
-      "strategy": "intraday-momentum-v2"
-    }
-  ],
+  "realized": -69.36764599999998,
+  "positions": [],
   "closed": [
     {
       "symbol": "MSTR",
@@ -891,6 +874,26 @@
       "pnl": -1.574419,
       "closed_at": "2026-11-18T20:49:09.582172+00:00",
       "reason": "session close"
+    },
+    {
+      "symbol": "AAPL",
+      "underlying": "AAPL",
+      "multiplier": 1,
+      "feed": "iex",
+      "signal_bar": "2026-11-19T12:30:00-05:00",
+      "quantity": 0.284745,
+      "entry": 351.1908399999999,
+      "cost": 99.999836,
+      "mark": 347.66199,
+      "stop": 344.1670231999999,
+      "target": 365.2384735999999,
+      "planned_risk": 1.9999967147160058,
+      "opened_at": "2026-11-19T17:39:11.576216+00:00",
+      "strategy": "intraday-momentum-v2",
+      "exit": 347.66199,
+      "pnl": -1.004823,
+      "closed_at": "2026-11-19T20:49:17.182576+00:00",
+      "reason": "session close"
     }
   ],
   "last_entry": {
@@ -920,7 +923,12 @@
     "WMT": "2026-11-13",
     "IWM": "2026-11-18"
   },
-  "updated_at": "2026-11-19T20:44:13.594598+00:00",
-  "equity": 430.87699,
-  "unsettled": []
+  "updated_at": "2026-11-19T20:49:17.135846+00:00",
+  "equity": 430.632354,
+  "unsettled": [
+    {
+      "date": "2026-11-19",
+      "amount": 98.995013
+    }
+  ]
 }
