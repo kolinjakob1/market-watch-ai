@@ -1,24 +1,6 @@
 {
-  "cash": 135.0323154794046,
+  "cash": 278.9345469244613,
   "closed": [
-    {
-      "entry": 90.71,
-      "exit": 89.699,
-      "pnl": -0.28,
-      "reason": "STOP",
-      "strategy": "exploration_paper",
-      "symbol": "SOL/USD",
-      "time": "2026-11-06T16:13:09+00:00"
-    },
-    {
-      "entry": 53.1295,
-      "exit": 52.87,
-      "pnl": -0.98,
-      "reason": "STOP",
-      "strategy": "trend",
-      "symbol": "LTC/USD",
-      "time": "2026-11-06T17:23:09+00:00"
-    },
     {
       "entry": 0.072969,
       "exit": 0.0725243,
@@ -2700,48 +2682,45 @@
       "strategy": "exploration_paper",
       "symbol": "DOGE/USD",
       "time": "2026-11-24T02:23:09+00:00"
+    },
+    {
+      "entry": 202.62,
+      "exit": 201.704,
+      "pnl": -0.15,
+      "reason": "STOP",
+      "strategy": "exploration_paper",
+      "symbol": "BCH/USD",
+      "time": "2026-11-24T06:03:11+00:00"
+    },
+    {
+      "entry": 1705.224,
+      "exit": 1697.38,
+      "pnl": -0.95,
+      "reason": "STOP",
+      "strategy": "trend",
+      "symbol": "ETH/USD",
+      "time": "2026-11-24T06:03:11+00:00"
     }
   ],
   "cooldown": {
     "AAVE/USD": "2026-11-22T20:18:10+00:00",
     "AVAX/USD": "2026-11-23T16:18:11+00:00",
-    "BCH/USD": "2026-11-24T01:58:10+00:00",
+    "BCH/USD": "2026-11-24T06:03:11+00:00",
     "BTC/USD": "2026-11-24T01:48:10+00:00",
     "DOGE/USD": "2026-11-24T02:23:09+00:00",
-    "ETH/USD": "2026-11-23T12:18:10+00:00",
+    "ETH/USD": "2026-11-24T06:03:11+00:00",
     "LINK/USD": "2026-11-24T00:48:08+00:00",
     "LTC/USD": "2026-11-23T14:28:13+00:00",
     "SOL/USD": "2026-11-23T16:33:09+00:00",
     "UNI/USD": "2026-11-24T01:23:09+00:00"
   },
-  "last_heartbeat": "2026-11-24T05:58:14+00:00",
+  "last_heartbeat": "2026-11-24T06:03:11+00:00",
   "last_scan": {
-    "events": 0,
+    "events": 2,
     "fresh_quotes": 10,
     "symbols": 10,
-    "time": "2026-11-24T05:58:14+00:00"
+    "time": "2026-11-24T06:03:11+00:00"
   },
-  "positions": {
-    "BCH/USD": {
-      "bar": "2026-11-24T05:05:00Z",
-      "entry": 202.62,
-      "qty": 0.09855910044714784,
-      "spent": 19.999999999999996,
-      "stop": 201.82135714285715,
-      "strategy": "exploration_paper",
-      "target": 204.05755714285715,
-      "time": "2026-11-24T05:13:18+00:00"
-    },
-    "ETH/USD": {
-      "bar": "2026-11-24T05:20:00Z",
-      "entry": 1705.224,
-      "qty": 0.0731943608750269,
-      "spent": 125.0,
-      "stop": 1699.1605714285713,
-      "strategy": "trend",
-      "target": 1716.1381714285715,
-      "time": "2026-11-24T05:28:08+00:00"
-    }
-  },
+  "positions": {},
   "version": 1
 }
