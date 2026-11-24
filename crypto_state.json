@@ -1,24 +1,6 @@
 {
-  "cash": 129.01988101511046,
+  "cash": 272.5147188823653,
   "closed": [
-    {
-      "entry": 10.943,
-      "exit": 10.91,
-      "pnl": -0.75,
-      "reason": "STOP",
-      "strategy": "breakout",
-      "symbol": "LINK/USD",
-      "time": "2026-11-06T22:18:12+00:00"
-    },
-    {
-      "entry": 131.122,
-      "exit": 130.6,
-      "pnl": -0.87,
-      "reason": "STOP",
-      "strategy": "trend",
-      "symbol": "AAVE/USD",
-      "time": "2026-11-06T22:43:13+00:00"
-    },
     {
       "entry": 2238.104,
       "exit": 2230.0,
@@ -2700,6 +2682,24 @@
       "strategy": "trend",
       "symbol": "BTC/USD",
       "time": "2026-11-24T15:08:10+00:00"
+    },
+    {
+      "entry": 8.9169,
+      "exit": 8.852,
+      "pnl": -1.28,
+      "reason": "STOP",
+      "strategy": "trend",
+      "symbol": "LINK/USD",
+      "time": "2026-11-24T19:03:13+00:00"
+    },
+    {
+      "entry": 4.7491,
+      "exit": 4.7101,
+      "pnl": -0.22,
+      "reason": "STOP",
+      "strategy": "exploration_paper",
+      "symbol": "UNI/USD",
+      "time": "2026-11-24T19:03:13+00:00"
     }
   ],
   "cooldown": {
@@ -2709,39 +2709,18 @@
     "BTC/USD": "2026-11-24T15:08:10+00:00",
     "DOGE/USD": "2026-11-24T02:23:09+00:00",
     "ETH/USD": "2026-11-24T13:13:12+00:00",
-    "LINK/USD": "2026-11-24T06:33:11+00:00",
+    "LINK/USD": "2026-11-24T19:03:13+00:00",
     "LTC/USD": "2026-11-23T14:28:13+00:00",
     "SOL/USD": "2026-11-24T08:08:11+00:00",
-    "UNI/USD": "2026-11-24T01:23:09+00:00"
+    "UNI/USD": "2026-11-24T19:03:13+00:00"
   },
-  "last_heartbeat": "2026-11-24T18:58:09+00:00",
+  "last_heartbeat": "2026-11-24T19:03:13+00:00",
   "last_scan": {
-    "events": 0,
+    "events": 2,
     "fresh_quotes": 10,
     "symbols": 10,
-    "time": "2026-11-24T18:58:09+00:00"
+    "time": "2026-11-24T19:03:13+00:00"
   },
-  "positions": {
-    "LINK/USD": {
-      "bar": "2026-11-24T17:55:00Z",
-      "entry": 8.9169,
-      "qty": 13.997328760977117,
-      "spent": 125.0,
-      "stop": 8.869080535714286,
-      "strategy": "trend",
-      "target": 9.002975035714286,
-      "time": "2026-11-24T18:03:10+00:00"
-    },
-    "UNI/USD": {
-      "bar": "2026-11-24T17:35:00Z",
-      "entry": 4.7491,
-      "qty": 4.205016725821965,
-      "spent": 19.999999999999996,
-      "stop": 4.712848214285715,
-      "strategy": "exploration_paper",
-      "target": 4.814353214285714,
-      "time": "2026-11-24T17:43:08+00:00"
-    }
-  },
+  "positions": {},
   "version": 1
 }
