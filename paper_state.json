@@ -2,41 +2,8 @@
   "version": 1,
   "initial": 500,
   "cash": 222.23445500000003,
-  "realized": -77.76558399999999,
-  "positions": [
-    {
-      "symbol": "BABA",
-      "underlying": "BABA",
-      "multiplier": 1,
-      "feed": "iex",
-      "signal_bar": "2026-11-25T11:45:00-05:00",
-      "quantity": 1.202601,
-      "entry": 83.15306999999999,
-      "cost": 99.999965,
-      "mark": 84.96495,
-      "stop": 81.49000859999998,
-      "target": 86.47919279999999,
-      "planned_risk": 1.9999993027014045,
-      "opened_at": "2026-11-25T16:54:14.508457+00:00",
-      "strategy": "intraday-momentum-v2"
-    },
-    {
-      "symbol": "AAPL",
-      "underlying": "AAPL",
-      "multiplier": 1,
-      "feed": "iex",
-      "signal_bar": "2026-11-25T11:55:00-05:00",
-      "quantity": 0.285437,
-      "entry": 350.33998999999994,
-      "cost": 99.999996,
-      "mark": 354.07557,
-      "stop": 343.33319019999993,
-      "target": 364.35358959999996,
-      "planned_risk": 1.9999999145126028,
-      "opened_at": "2026-11-25T17:04:10.818771+00:00",
-      "strategy": "intraday-momentum-v2"
-    }
-  ],
+  "realized": -74.454758,
+  "positions": [],
   "closed": [
     {
       "symbol": "MSTR",
@@ -1047,6 +1014,46 @@
       "pnl": -1.632351,
       "closed_at": "2026-11-24T20:49:08.892643+00:00",
       "reason": "session close"
+    },
+    {
+      "symbol": "BABA",
+      "underlying": "BABA",
+      "multiplier": 1,
+      "feed": "iex",
+      "signal_bar": "2026-11-25T11:45:00-05:00",
+      "quantity": 1.202601,
+      "entry": 83.15306999999999,
+      "cost": 99.999965,
+      "mark": 84.96495,
+      "stop": 81.49000859999998,
+      "target": 86.47919279999999,
+      "planned_risk": 1.9999993027014045,
+      "opened_at": "2026-11-25T16:54:14.508457+00:00",
+      "strategy": "intraday-momentum-v2",
+      "exit": 84.96495,
+      "pnl": 2.178969,
+      "closed_at": "2026-11-25T20:49:18.274482+00:00",
+      "reason": "session close"
+    },
+    {
+      "symbol": "AAPL",
+      "underlying": "AAPL",
+      "multiplier": 1,
+      "feed": "iex",
+      "signal_bar": "2026-11-25T11:55:00-05:00",
+      "quantity": 0.285437,
+      "entry": 350.33998999999994,
+      "cost": 99.999996,
+      "mark": 354.30534,
+      "stop": 343.33319019999993,
+      "target": 364.35358959999996,
+      "planned_risk": 1.9999999145126028,
+      "opened_at": "2026-11-25T17:04:10.818771+00:00",
+      "strategy": "intraday-momentum-v2",
+      "exit": 354.30534,
+      "pnl": 1.131857,
+      "closed_at": "2026-11-25T20:49:18.274482+00:00",
+      "reason": "session close"
     }
   ],
   "last_entry": {
@@ -1076,7 +1083,16 @@
     "WMT": "2026-11-13",
     "IWM": "2026-11-18"
   },
-  "updated_at": "2026-11-25T20:44:09.576010+00:00",
-  "equity": 425.479657,
-  "unsettled": []
+  "updated_at": "2026-11-25T20:49:18.220103+00:00",
+  "equity": 425.545242,
+  "unsettled": [
+    {
+      "date": "2026-11-25",
+      "amount": 102.178934
+    },
+    {
+      "date": "2026-11-25",
+      "amount": 101.131853
+    }
+  ]
 }
