@@ -2,41 +2,8 @@
   "version": 1,
   "initial": 500,
   "cash": 125.545647,
-  "realized": -76.584503,
-  "positions": [
-    {
-      "symbol": "DIA",
-      "underlying": "DIA",
-      "multiplier": 1,
-      "feed": "iex",
-      "signal_bar": "2026-11-27T11:15:00-05:00",
-      "quantity": 0.19731,
-      "entry": 506.81630999999993,
-      "cost": 99.999926,
-      "mark": 506.05344,
-      "stop": 496.67998379999995,
-      "target": 527.0889623999999,
-      "planned_risk": 1.9999985225219972,
-      "opened_at": "2026-11-27T16:24:10.490277+00:00",
-      "strategy": "intraday-momentum-v2"
-    },
-    {
-      "symbol": "SMH",
-      "underlying": "SMH",
-      "multiplier": 1,
-      "feed": "iex",
-      "signal_bar": "2026-11-27T11:50:00-05:00",
-      "quantity": 0.229882,
-      "entry": 435.00456999999994,
-      "cost": 99.999721,
-      "mark": 432.48708,
-      "stop": 426.3044785999999,
-      "target": 452.4047528,
-      "planned_risk": 1.9999944112148045,
-      "opened_at": "2026-11-27T16:59:16.272061+00:00",
-      "strategy": "intraday-momentum-v2"
-    }
-  ],
+  "realized": -77.479501,
+  "positions": [],
   "closed": [
     {
       "symbol": "MSTR",
@@ -1107,6 +1074,46 @@
       "pnl": -2.129745,
       "closed_at": "2026-11-27T16:59:16.209601+00:00",
       "reason": "stop"
+    },
+    {
+      "symbol": "DIA",
+      "underlying": "DIA",
+      "multiplier": 1,
+      "feed": "iex",
+      "signal_bar": "2026-11-27T11:15:00-05:00",
+      "quantity": 0.19731,
+      "entry": 506.81630999999993,
+      "cost": 99.999926,
+      "mark": 505.78371000000004,
+      "stop": 496.67998379999995,
+      "target": 527.0889623999999,
+      "planned_risk": 1.9999985225219972,
+      "opened_at": "2026-11-27T16:24:10.490277+00:00",
+      "strategy": "intraday-momentum-v2",
+      "exit": 505.78371000000004,
+      "pnl": -0.203742,
+      "closed_at": "2026-11-27T17:49:12.095793+00:00",
+      "reason": "session close"
+    },
+    {
+      "symbol": "SMH",
+      "underlying": "SMH",
+      "multiplier": 1,
+      "feed": "iex",
+      "signal_bar": "2026-11-27T11:50:00-05:00",
+      "quantity": 0.229882,
+      "entry": 435.00456999999994,
+      "cost": 99.999721,
+      "mark": 431.99757,
+      "stop": 426.3044785999999,
+      "target": 452.4047528,
+      "planned_risk": 1.9999944112148045,
+      "opened_at": "2026-11-27T16:59:16.272061+00:00",
+      "strategy": "intraday-momentum-v2",
+      "exit": 431.99757,
+      "pnl": -0.691256,
+      "closed_at": "2026-11-27T17:49:12.095793+00:00",
+      "reason": "session close"
     }
   ],
   "last_entry": {
@@ -1137,12 +1144,20 @@
     "IWM": "2026-11-18",
     "DIA": "2026-11-27"
   },
-  "updated_at": "2026-11-27T17:44:09.385853+00:00",
-  "equity": 422.686249,
+  "updated_at": "2026-11-27T17:49:11.581361+00:00",
+  "equity": 422.520499,
   "unsettled": [
     {
       "date": "2026-11-27",
       "amount": 97.870203
+    },
+    {
+      "date": "2026-11-27",
+      "amount": 99.796184
+    },
+    {
+      "date": "2026-11-27",
+      "amount": 99.308465
     }
   ]
 }
