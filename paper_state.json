@@ -1,9 +1,26 @@
 {
   "version": 1,
   "initial": 500,
-  "cash": 425.54524200000003,
+  "cash": 325.545316,
   "realized": -74.454758,
-  "positions": [],
+  "positions": [
+    {
+      "symbol": "DIA",
+      "underlying": "DIA",
+      "multiplier": 1,
+      "feed": "iex",
+      "signal_bar": "2026-11-27T11:15:00-05:00",
+      "quantity": 0.19731,
+      "entry": 506.81630999999993,
+      "cost": 99.999926,
+      "mark": 505.68381,
+      "stop": 496.67998379999995,
+      "target": 527.0889623999999,
+      "planned_risk": 1.9999985225219972,
+      "opened_at": "2026-11-27T16:24:10.490277+00:00",
+      "strategy": "intraday-momentum-v2"
+    }
+  ],
   "closed": [
     {
       "symbol": "MSTR",
@@ -1081,9 +1098,10 @@
     "HOOD": "2026-11-12",
     "DIS": "2026-11-13",
     "WMT": "2026-11-13",
-    "IWM": "2026-11-18"
+    "IWM": "2026-11-18",
+    "DIA": "2026-11-27"
   },
-  "updated_at": "2026-11-27T16:19:08.434519+00:00",
-  "equity": 425.545242,
+  "updated_at": "2026-11-27T16:24:10.319980+00:00",
+  "equity": 425.321789,
   "unsettled": []
 }
