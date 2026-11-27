@@ -1,24 +1,6 @@
 {
-  "cash": 12.007062454729763,
+  "cash": 263.5264204136038,
   "closed": [
-    {
-      "entry": 8.2981,
-      "exit": 8.2367,
-      "pnl": -0.21,
-      "reason": "STOP",
-      "strategy": "exploration_paper",
-      "symbol": "AVAX/USD",
-      "time": "2026-11-10T18:58:11+00:00"
-    },
-    {
-      "entry": 83.467,
-      "exit": 82.9692,
-      "pnl": -1.12,
-      "reason": "STOP",
-      "strategy": "breakout",
-      "symbol": "SOL/USD",
-      "time": "2026-11-10T20:33:10+00:00"
-    },
     {
       "entry": 73520.461,
       "exit": 73919.49,
@@ -2700,48 +2682,45 @@
       "strategy": "exploration_paper",
       "symbol": "AAVE/USD",
       "time": "2026-11-27T01:38:09+00:00"
+    },
+    {
+      "entry": 60700.023,
+      "exit": 61185.042,
+      "pnl": 0.62,
+      "reason": "TARGET",
+      "strategy": "breakout",
+      "symbol": "BTC/USD",
+      "time": "2026-11-27T02:08:19+00:00"
+    },
+    {
+      "entry": 71.3812,
+      "exit": 72.11,
+      "pnl": 0.9,
+      "reason": "TARGET",
+      "strategy": "trend",
+      "symbol": "SOL/USD",
+      "time": "2026-11-27T02:08:19+00:00"
     }
   ],
   "cooldown": {
     "AAVE/USD": "2026-11-27T01:38:09+00:00",
     "AVAX/USD": "2026-11-25T20:28:08+00:00",
     "BCH/USD": "2026-11-27T00:13:07+00:00",
-    "BTC/USD": "2026-11-26T09:23:09+00:00",
+    "BTC/USD": "2026-11-27T02:08:19+00:00",
     "DOGE/USD": "2026-11-26T22:08:15+00:00",
     "ETH/USD": "2026-11-26T22:03:10+00:00",
     "LINK/USD": "2026-11-27T01:18:09+00:00",
     "LTC/USD": "2026-11-27T00:28:08+00:00",
-    "SOL/USD": "2026-11-26T21:33:10+00:00",
+    "SOL/USD": "2026-11-27T02:08:19+00:00",
     "UNI/USD": "2026-11-25T19:48:08+00:00"
   },
-  "last_heartbeat": "2026-11-27T02:03:10+00:00",
+  "last_heartbeat": "2026-11-27T02:08:19+00:00",
   "last_scan": {
-    "events": 0,
+    "events": 2,
     "fresh_quotes": 10,
     "symbols": 10,
-    "time": "2026-11-27T02:03:10+00:00"
+    "time": "2026-11-27T02:08:19+00:00"
   },
-  "positions": {
-    "BTC/USD": {
-      "bar": "2026-11-27T01:05:00Z",
-      "entry": 60700.023,
-      "qty": 0.002056222957753358,
-      "spent": 125.0,
-      "stop": 60517.922931,
-      "strategy": "breakout",
-      "target": 61100.6431518,
-      "time": "2026-11-27T01:18:09+00:00"
-    },
-    "SOL/USD": {
-      "bar": "2026-11-27T01:45:00Z",
-      "entry": 71.3812,
-      "qty": 1.7485385623771645,
-      "spent": 125.00000000000001,
-      "stop": 71.1670564,
-      "strategy": "trend",
-      "target": 71.76665848,
-      "time": "2026-11-27T01:53:09+00:00"
-    }
-  },
+  "positions": {},
   "version": 1
 }
